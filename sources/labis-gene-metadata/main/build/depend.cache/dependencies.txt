@@ -1,5 +1,4 @@
-||:org.intermine.bio.dataconversion.MalariamineHeatmapDataConverter
-org.intermine.bio.dataconversion.MalariamineHeatmapDataConverter
+||:org.intermine.bio.dataconversion.LabisGeneMetadataConverter
 java.lang.StringBuilder
 java.lang.System
 java.io.Reader
@@ -8,7 +7,7 @@ java.util.logging.Logger
 java.io.File
 java.util.logging.SimpleFormatter
 java.util.Map
-java.util.Random
+org.intermine.bio.dataconversion.LabisGeneMetadataConverter
 [Ljava.lang.String;
 java.io.IOException
 org.intermine.bio.dataconversion.BioFileConverter

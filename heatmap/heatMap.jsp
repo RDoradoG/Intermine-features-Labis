@@ -4,14 +4,14 @@
 <%@ page import="java.net.URLEncoder" language="java" %>
 
 <!-- heatMap.jsp -->
-<!-- Print Pollo: -->
-<!-- ${print_json}  -->
+<!-- pollo -->
+<!-- ${pollo} -->
 <html:xhtml />
 
 <tiles:importAttribute />
 
 <!--[if IE]><script type="text/javascript" src="model/canvasXpress/js/excanvas.js"></script><![endif]-->
-    <script type="text/javascript" src="model/canvasXpress/js/canvasXpress.min.js"></script>
+<script type="text/javascript" src="model/canvasXpress/js/canvasXpress.min.js"></script>
 
 <div class="body" id="expression_div">
 
@@ -40,7 +40,7 @@ jQuery(document).ready(function () {
 
 <%--
 <hr>
-${expressionScoreJSONCellLine}
+${expressionScoreJSON}
 <hr>
 --%>
     <div id="heatmap_div">
@@ -88,18 +88,22 @@ ${expressionScoreJSONCellLine}
               <tr>
                 <td>
                     <div style="padding: 0px 0px 5px 30px;">
-                     <span>Cell Line Clustering - Hierarchical:</span>
-                     <select id="cl-hc">
-                         <option value="single" selected="selected">Single</option>
-                         <option value="complete">Complete</option>
-                         <option value="average">Average</option>
-                     </select>
-                     <span> and K-means:</span>
-                     <select id="cl-km">
-                         <option value="3" selected="selected">3</option>
-                     </select>
+                      <span>Experiment:</span>
+                      <select id="experimentSelect"></select>
+                      <span>Cell Line Clustering - Hierarchical:</span>
+                      <select id="hierarchicalSelect">
+                        <option value="single" selected="selected">Single</option>
+                        <option value="complete">Complete</option>
+                        <option value="average">Average</option>
+                      </select>
+                      <span> and K-means:</span>
+                      <select id="kMenasSelect">
+                        <option value="3" selected="selected">3</option>
+                      </select>
                     </div>
-                    <canvas id="canvas_cl" width="525" height="550"></canvas>
+                    <div id="set_canvas">
+                      <canvas id="canvas_cl" width="700" height="550"></canvas>
+                    </div>
                 </td>
               </tr>
             </table>
@@ -133,97 +137,14 @@ modENCODE submission</a>, with links to the original score files for <a href="ht
 
 
 <script type="text/javascript">
-var feature_count = parseInt(${FeatureCount});
-var max_cluster = parseInt(${MAX_CLUSTER});
-var max_map = parseInt(${MAX_MAP});
-    if (15 < 10) {
-        jQuery('#heatmap_div').remove();
-        jQuery('#expression_div').html('<i>Expression scores are not available</i>');
-     } else {
-         if (feature_count > max_map) {
-             jQuery('#heatmap_div').remove();
-             jQuery('#expression_div').html('<i>Too many elements, please select a subset to see the heat maps.</i>');
-         }
-         jQuery("#description").hide();
-         jQuery("#description_div").click(function () {
-               if(jQuery("#description").is(":hidden")) {
-                 jQuery("#co").attr("src", "images/disclosed.gif");
-               } else {
-                 jQuery("#co").attr("src", "images/undisclosed.gif");
-               }
-               jQuery("#description").toggle("slow");
-            });
-           // hm - heatmap; cl - cellline; ds - developmentalstage; hc - hierarchical clustering; km - kmeans
-            var hm_cl = new CanvasXpress('canvas_cl',
-                                        ${expressionScoreJSON},
-                                         {graphType: 'Heatmap',
-                                          title: 'Cell Line',
-                                          // heatmapType: 'yellow-purple',
-                                          dendrogramSpace: 6,
-                                          smpDendrogramPosition: 'right',
-                                          varDendrogramPosition: 'bottom',
-                                          setMin: ${minExpressionScore},
-                                          setMax: ${maxExpressionScore},
-                                          varLabelRotate: 45,
-                                          centerData: false,
-                                          autoExtend: true},
-                                          {click: function(o) {
-                                                   var featureId = o.y.smps;
-                                                   var condition = o.y.vars;
-                                                   if ("gene" == "gene") {
-                                                       var query = '<query name="" model="genomic" view="GeneExpressionScore.score GeneExpressionScore.cellLine.name GeneExpressionScore.gene.primaryIdentifier GeneExpressionScore.gene.secondaryIdentifier GeneExpressionScore.gene.symbol GeneExpressionScore.gene.name GeneExpressionScore.gene.source GeneExpressionScore.organism.shortName GeneExpressionScore.submission.title GeneExpressionScore.submission.design GeneExpressionScore.submission.DCCid" sortOrder="GeneExpressionScore.score asc" constraintLogic="A and B"><constraint path="GeneExpressionScore.gene" code="B" op="LOOKUP" value="' + featureId + '" extraValue=""/><constraint path="GeneExpressionScore.cellLine" code="A" op="LOOKUP" value="' + condition + '"/></query>';
-                                                       var encodedQuery = encodeURIComponent(query);
-                                                       encodedQuery = encodedQuery.replace("%20", "+");
-                                                       window.open("/${WEB_PROPERTIES['webapp.path']}/loadQuery.do?skipBuilder=true&query=" + encodedQuery + "%0A++++++++++++&trail=|query&method=xml");
-                                                   } else if ("gene" == "exon") {
-                                                       var query = '<query name="" model="genomic" view="ExonExpressionScore.score ExonExpressionScore.cellLine.name ExonExpressionScore.exon.primaryIdentifier ExonExpressionScore.exon.symbol  ExonExpressionScore.exon.gene.primaryIdentifier ExonExpressionScore.exon.gene.symbol ExonExpressionScore.organism.shortName ExonExpressionScore.submission.title ExonExpressionScore.submission.design ExonExpressionScore.submission.DCCid" sortOrder="ExonExpressionScore.exon.primaryIdentifier asc" constraintLogic="A and B"><constraint path="ExonExpressionScore.exon" code="A" op="LOOKUP" value="' + featureId + '" extraValue=""/><constraint path="ExonExpressionScore.cellLine" code="B" op="LOOKUP" value="' + condition + '" extraValue=""/></query>';
-                                                       var encodedQuery = encodeURIComponent(query);
-                                                       encodedQuery = encodedQuery.replace("%20", "+");
-                                                       window.open("/${WEB_PROPERTIES['webapp.path']}/loadQuery.do?skipBuilder=true&query=" + encodedQuery + "%0A++++++++++++&trail=|query&method=xml");
-                                                   } else {
-                                                      alert("gene");
-                                                   }
-                                                   // window.open('/${WEB_PROPERTIES['webapp.path']}/portal.do?class=Gene&externalids=' + o.y.smps);
-                                                  }}
-                                         );
-            // cluster on gene/exons
-            if (feature_count > max_cluster) {
-                jQuery("#cl-hc").attr('disabled', true);
-            }
-            if (feature_count > 3 && feature_count <= max_cluster) {
-                hm_cl.clusterSamples();
-                hm_cl.kmeansSamples();
-                for (var i=4; i < feature_count; ++i) {
-                    jQuery('#cl-km').
-                              append(jQuery("<option></option>").
-                              attr("value",i).
-                              text(i));
-                }
-            } else {
-                jQuery("#cl-km").attr('disabled', true);
-            }
-            // cluster on conditions
-            if (feature_count <= max_cluster) {
-                hm_cl.clusterVariables(); // clustering method will call draw action within it.
-                hm_cl.draw();
-            }
-            // cx_cellline.kmeansVariables();
-//            hm_cl.draw();
-
-
-           jQuery('#cl-hc').change(function() {
-                hm_cl.linkage = this.value;
-                if (feature_count >= 3) { hm_cl.clusterSamples(); }
-                hm_cl.clusterVariables();
-                hm_cl.draw();
-           });
-           jQuery('#cl-km').change(function() {
-                hm_cl.kmeansClusters = parseInt(this.value);
-                hm_cl.kmeansSamples();
-                // hm_cl.kmeansVariables();
-                hm_cl.draw();
-           });
-     }
-    </script>
+  var feature_count   = parseInt(${FeatureCount});
+  var max_cluster     = parseInt(${MAX_CLUSTER});
+  var max_map         = parseInt(${MAX_MAP});
+  var sizeExpressions = parseInt(${fn:length(expressionScoreJSON)});
+  var canvasData      = ${expressionScoreJSON};
+  var JsonExepriemnts = ${JsonExepriemnts};
+  var webAppPath      = "${WEB_PROPERTIES['webapp.path']}";
+</script>
+<script type="text/javascript" src="model/js/heatMap.js"></script>
 
 <!-- /heatMap.jsp -->

@@ -82,18 +82,39 @@ public class HeatMapController extends TilesAction
 
 
     private void findExpression(HttpServletRequest request, Model model, InterMineBag bag, PathQueryExecutor executor, ObjectStore os) throws ObjectStoreException {
-        String expressionType                        = bag.getType().toLowerCase();
-        DecimalFormat df                             = new DecimalFormat("#.##");
-        String expressionScoreJSON                   = null;
-        Map<String, List<Double>> expressionScoreMap = new LinkedHashMap<String, List<Double>>();
-        ArrayList<String> Conditions                 = new ArrayList<String>();
-        Double MaxScore                              = 0.0;
-        Double MinScore                              = 0.0;
-        int firstRow                                 = 0;
+        String expressionType                       = bag.getType().toLowerCase();
+        DecimalFormat df                            = new DecimalFormat("#.##");
+        String expressionScoreJSON                  = "";
+        Map<String, List<Float>> expressionScoreMap = new LinkedHashMap<String, List<Float>>();
+        ArrayList<String> Conditions                = new ArrayList<String>();
+        int firstRow                                = 0;
+        List<String> allExepriments                 = new ArrayList<String>();
+        String JsonExepriemnts                      = "";
+        PathQuery queryExpoeriments                 = getQueryExperiments(bag, model);
+        float numberOfData = 0;
+        float meanOfData = 0.0f;
+        float sumOfData = 0; 
 
-        PathQuery queryCondition                     = queryConditions(bag, model);
-        PathQuery query                              = queryExpressionScore(bag, model);
+        ExportResultsIterator resultExperiments;
+        try {
+            resultExperiments = executor.execute(queryExpoeriments);
+        } catch (ObjectStoreException e) {
+            throw new RuntimeException("Error retrieving data.", e);
+        }
 
+        while (resultExperiments.hasNext()) {
+            List<ResultElement> rowExperiment = resultExperiments.next();
+            String name                       = (String) rowExperiment.get(0).getField();
+            String description                = (String) rowExperiment.get(1).getField();
+            if(!allExepriments.contains(name)){
+                allExepriments.add(name);
+                String additon  = "{name: '" + name + "', description: '" + description + "'}";
+                JsonExepriemnts = addToJsonList(JsonExepriemnts, additon);
+            }
+        }
+
+        JsonExepriemnts          = "[" + JsonExepriemnts + "]";
+        PathQuery queryCondition = queryConditions(bag, model);
         ExportResultsIterator resultConditions;
         try {
             resultConditions = executor.execute(queryCondition);
@@ -108,71 +129,98 @@ public class HeatMapController extends TilesAction
                 Conditions.add(setCondition);
             }
         }
-
-        ExportResultsIterator result;
-        try {
-            result = executor.execute(query);
-        } catch (ObjectStoreException e) {
-            throw new RuntimeException("Error retrieving data.", e);
-        }
-
-        while (result.hasNext()) {
-            List<ResultElement> row = result.next();
-            String id               = (String) row.get(0).getField();
-            String symbol           = (String) row.get(1).getField();
-            String condition        = (String) row.get(2).getField();
-            Double score            = (Double) row.get(3).getField();
-            if (symbol == null) {
-                symbol = id;
+        
+        for (int i = 0; i < allExepriments.size(); i++) {
+            float MaxScore        = 0;
+            float MinScore        = 0;
+            String nameExperiment = allExepriments.get(i);
+            PathQuery query       = queryExpressionScore(bag, model,  nameExperiment);
+            ExportResultsIterator result;
+            try {
+                result = executor.execute(query);
+            } catch (ObjectStoreException e) {
+                throw new RuntimeException("Error retrieving data.", e);
             }
-            if(firstRow == 0){
-                firstRow = 1;
-                MaxScore = score;
-                MinScore = score;
-            }else{
-                if(score > MaxScore){
+
+            numberOfData = 0;
+            meanOfData = 0.0f;
+            sumOfData = 0; 
+
+            while (result.hasNext()) {
+                List<ResultElement> row = result.next();
+                String id               = (String) row.get(0).getField();
+                String symbol           = (String) row.get(1).getField();
+                String condition        = (String) row.get(2).getField();
+                Float score             = (Float) row.get(3).getField();
+                numberOfData++;
+                sumOfData += score;
+                if (symbol == null) {
+                    symbol = id;
+                }
+                if(firstRow == 0){
+                    firstRow = 1;
                     MaxScore = score;
-                }
-                if(score < MinScore){
                     MinScore = score;
+                }else{
+                    if(score > MaxScore){
+                        MaxScore = score;
+                    }
+                    if(score < MinScore){
+                        MinScore = score;
+                    }
+                }
+                if (!expressionScoreMap.containsKey(symbol)) {
+                    List<Float> ExpressionScores = new ArrayList<Float>(Collections.nCopies(Conditions.size(), 0f));
+                    ExpressionScores.set(Conditions.indexOf(condition), score);
+                    expressionScoreMap.put(symbol, ExpressionScores);
+
+                } else {
+                    expressionScoreMap.get(symbol).set(Conditions.indexOf(condition), score);
                 }
             }
-            if (!expressionScoreMap.containsKey(symbol)) {
-                List<Double> ExpressionScores = new ArrayList<Double>(Collections.nCopies(Conditions.size(), 0.0));
-                ExpressionScores.set(Conditions.indexOf(condition), score);
-                expressionScoreMap.put(symbol, ExpressionScores);
-
-            } else {
-                expressionScoreMap.get(symbol).set(Conditions.indexOf(condition), score);
-            }
+            meanOfData = sumOfData / numberOfData;
+            String additonJson  = parseToJSON(Conditions, expressionScoreMap);
+            String additon      = "{name: '" + nameExperiment + "', data: " + additonJson + ", min: " + df.format(MinScore) + ", max: " + df.format(MaxScore) + ", mean: " + meanOfData + ", numberData: " + numberOfData + ", deviation: 0}";
+            expressionScoreJSON = addToJsonList(expressionScoreJSON, additon);
         }
-        expressionScoreJSON = parseToJSON(Conditions, expressionScoreMap);
+        
+        expressionScoreJSON = "[" + expressionScoreJSON + "]";
+        request.setAttribute("JsonExepriemnts", JsonExepriemnts);
         request.setAttribute("expressionScoreJSON", expressionScoreJSON);
-        request.setAttribute("minExpressionScore", df.format(MinScore));
-        request.setAttribute("maxExpressionScore", df.format(MaxScore));
         request.setAttribute("ExpressionType", expressionType);
         request.setAttribute("FeatureCount", bag.getSize());
     }
 
-    private PathQuery queryExpressionScore(InterMineBag bag, Model model) {
+    private String addToJsonList(String value, String addition) {
+        if(value.equals("")){
+            return value + addition;
+        } else {
+            return value + ", " + addition;
+        }
+    }
+
+    private PathQuery queryExpressionScore(InterMineBag bag, Model model, String Experiment) {
         PathQuery query = new PathQuery(model);
-        // Select the output columns:
         query.addViews("ExpressionValues.gene.primaryIdentifier", "ExpressionValues.gene.symbol", "ExpressionValues.condition", "ExpressionValues.expressionValue");
-        // Add orderby
         query.addOrderBy("ExpressionValues.gene.primaryIdentifier", OrderDirection.ASC);
-        // Filter the results with the following constraints:
-        query.addConstraint(Constraints.in("ExpressionValues.gene", bag.getName()));
+        query.addConstraint(Constraints.in("ExpressionValues.gene", bag.getName()), "A");
+        query.addConstraint(Constraints.eq("ExpressionValues.experiment.name", Experiment), "B");
+        query.setConstraintLogic("A and B");
         return query;
     }
 
     private PathQuery queryConditions(InterMineBag bag, Model model) {
         PathQuery query = new PathQuery(model);
-        // Select the output columns:
         query.addViews("ExpressionValues.condition");
-        // Add orderby
         query.addOrderBy("ExpressionValues.condition", OrderDirection.ASC);
-        // Filter the results with the following constraints:
         query.addConstraint(Constraints.in("ExpressionValues.gene", bag.getName()));
+        return query;
+    }
+
+    private PathQuery getQueryExperiments(InterMineBag bag, Model model) {
+        PathQuery query = new PathQuery(model);
+        query.addViews("ExperimentDescription.name", "ExperimentDescription.description");
+        query.addOrderBy("ExperimentDescription.name", OrderDirection.ASC);
         return query;
     }
 
@@ -183,7 +231,7 @@ public class HeatMapController extends TilesAction
      * @param geneExpressionScoreMap
      * @return json string
      */
-    private String parseToJSON(ArrayList<String> vars, Map<String, List<Double>> Scores) {
+    private String parseToJSON(ArrayList<String> vars, Map<String, List<Float>> Scores) {
         if (Scores.size() == 0) {
             return "{}";
         }
@@ -192,8 +240,8 @@ public class HeatMapController extends TilesAction
         Map<String, Object> yInHeatmapData =  new LinkedHashMap<String, Object>();
         List<String> smps                  =  new ArrayList<String>(Scores.keySet());
         List<String> desc                  =  new ArrayList<String>();
-        double[][] data                    = new double[smps.size()][vars.size()];
-        double[][] rotatedData             = new double[vars.size()][smps.size()];
+        float[][] data                     = new float[smps.size()][vars.size()];
+        float[][] rotatedData              = new float[vars.size()][smps.size()];
 
         desc.add("Intensity");
         for (int i = 0; i < smps.size(); i++) {
