@@ -6,18 +6,26 @@
   		<attribute name="name" type="java.lang.String" />
   		<attribute name="description" type="java.lang.String" />
   		<reference name="publication" referenced-type="Publication" />
+  		<collection name="ExpressionValue"  referenced-type="ExpressionValues" reverse-reference="experiment"/>
+  		<collection name="columns"  referenced-type="ExperimentDescriptionColumns" reverse-reference="experiment"/>
   	</class>
 
+	<class name="ExpressionTypeDiccionary" is-interface="true">
+  		<attribute name="name" type="java.lang.String" />
+  		<collection name="ExpressionValue"  referenced-type="ExpressionValues" reverse-reference="type"/>
+  	</class>  	
+
  	<class name="ExpressionValues" is-interface="true">
-  		<reference name="gene" referenced-type="Gene" />
-  		<reference name="experiment" referenced-type="ExperimentDescription" />
   		<attribute name="condition" type="java.lang.String" />
   		<attribute name="expressionValue" type="java.lang.Float" />
+  		<reference name="gene" referenced-type="Gene" />
+  		<reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="ExpressionValue" />
+  		<reference name="type" referenced-type="ExpressionTypeDiccionary" reverse-reference="ExpressionValue" />
   	</class>
 
   	<class name="ExperimentDescriptionColumns" is-interface="true">
   		<attribute name="columnName" type="java.lang.String" />
   		<attribute name="description" type="java.lang.String" />
-  		<reference name="experiment" referenced-type="ExperimentDescription" />
+  		<reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="columns" />
   	</class>
 </classes>

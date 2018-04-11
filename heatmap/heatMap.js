@@ -1,43 +1,143 @@
 //Autor: Rodrigo Dorado
 
-console.log(canvasData);
-fillExperimentsOptions();
-drawCanvas(0);
+fillTypeExperiment();
+
+function fillTypeExperiment() {
+	var selected = true;
+	for (var i = 0; i < types.length; i++) {
+		fillAOption('experimentType', types[i].name, selected);
+		selected = false;
+	}
+	if (!selected) {
+		ChangeExperimentType(types[0].name);
+	}
+}
+
+function filTypeExperiment(result) {
+	var selected = true;
+	jQuery('#experimentSelect').html('');
+	for (var i = 0; i < result.length; i++) {
+		fillAOption('experimentSelect', result[i]['ExperimentDescription.name'], selected);
+		selected = false;
+	}
+	if (!selected) {
+		ChangeExepreiment(result[0]['ExperimentDescription.name']);
+	}
+}
+
+function fillAOption(id, value, selected) {
+	var option = jQuery("<option></option>").attr("value", value).text(value);
+	if (selected) {
+		option.attr("selected", "selected");
+	}
+	jQuery('#' + id).append(option);
+}
+
+
+jQuery('#experimentType').change(function() {
+	ChangeExperimentType(this.value);
+});
 
 jQuery('#experimentSelect').change(function() {
 	ChangeExepreiment(this.value);
 });
 
-function ChangeExepreiment(experiment) {
-	for(var i = 0; i < JsonExepriemnts.length; i++) {
-		if(JsonExepriemnts[i].name == experiment) {
-			jQuery('#set_canvas').html('');
-			jQuery('#set_canvas').html('<canvas id="canvas_cl" width="700" height="550"></canvas>');
-			drawCanvas(i);
-			break;
+function ChangeExepreiment(value) {
+	experiment = value;
+	var query = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue ExpressionValues.gene.primaryIdentifier ExpressionValues.gene.secondaryIdentifier ExpressionValues.gene.symbol ExpressionValues.gene.name" sortOrder="ExpressionValues.gene.primaryIdentifier ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="A" /><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="B" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" /></query>';
+	APIExecuteQuery(query, 'Experiment');
+}
+
+function getConditions() {
+	var query = '<query model="genomic" view="ExpressionValues.condition" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="B" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" /></query>';
+	APIExecuteQuery(query, 'conditionsOfBag');
+}
+
+function setConditions(result) {
+	arrayConditions = [];
+	if (result.length > 0) {
+		arrayConditions.push(result[0]['ExpressionValues.condition']);
+		for (var i = 1; i < result.length; i++) {
+			if (result[i]['ExpressionValues.condition'] != result[i - 1]['ExpressionValues.condition']) {
+				arrayConditions.push(result[i]['ExpressionValues.condition']);
+			}
 		}
 	}
+	getExpressionValues()
+
 }
 
-function fillExperimentsOptions() {
-	for (var i = 0; i < JsonExepriemnts.length; i++) {
-		fillExperimentsAOption(JsonExepriemnts[i].name);
+function getExpressionValues() {
+	var query = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue ExpressionValues.gene.primaryIdentifier" sortOrder="ExpressionValues.condition ASC ExpressionValues.gene.primaryIdentifier ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="B" /><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="C" /></query>';
+	APIExecuteQuery(query, 'ExpressionValues');
+}
+
+function ChangeExperimentType(value) {
+	typeSelected = value;
+	var query ='<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" constraintLogic="A and B" ><constraint path="ExperimentDescription.ExpressionValue.type.name" op="=" value="' + typeSelected + '" code="A" /><constraint path="ExperimentDescription.ExpressionValue.gene" op="IN" value="' + bagName + '" code="B" /></query>';
+	APIExecuteQuery(query, 'typeExperiment');
+}
+
+function getArrayData(result) {
+	var dataCanvas = [];
+	var rowCanvas  = [];
+	var sum        = 0;
+	var max        = 0;
+	var min        = 0;
+	if (result.length > 0) {
+		max = min = sum = result[0]['ExpressionValues.expressionValue'];
+		rowCanvas.push(sum);
+		for (var i = 1; i < result.length; i++) {
+			if (result[i]['ExpressionValues.condition'] != result[i - 1]['ExpressionValues.condition']) {
+				dataCanvas.push(rowCanvas);
+				rowCanvas = [];
+			}
+			var field = result[i]['ExpressionValues.expressionValue'];
+			rowCanvas.push(field);
+			sum       = sum + field;
+			if(field > max) {max = field;}
+			if(field < min) {min = field;}
+		}
+		if (rowCanvas.length > 0) {
+			dataCanvas.push(rowCanvas);
+		}
+	}
+	var mean          = sum / result.length;
+	var dataForCanvas = {
+		y: {
+			vars: arrayConditions,
+			smps: Genes,
+			desc: ['Intensity'],
+			data: dataCanvas
+		}
+	};
+	jQuery('#set_canvas').html('');
+	jQuery('#set_canvas').html('<canvas id="canvas_cl" width="700" height="550"></canvas>');
+	drawCanvas(dataForCanvas, mean, max, min, result.length, experiment);
+}
+
+function getResult(result, idFunction) {
+	switch(idFunction) {
+		case 'typeExperiment':
+			filTypeExperiment(result);
+		break;
+
+		case 'Experiment':
+			getConditions(result);
+		break;
+
+		case 'conditionsOfBag':
+			setConditions(result)
+		break;
+
+		case 'ExpressionValues':
+			getArrayData(result)
+		break;
 	}
 }
 
-function fillExperimentsAOption(value) {
-	jQuery('#experimentSelect').append(jQuery("<option></option>").attr("value", value).text(value));
-}
-
-function drawCanvas(position){
-	var dataForCanvas = canvasData[position].data;
-	var min           = canvasData[position].min;
-	var max           = canvasData[position].max;
-	var title         = canvasData[position].name;
-	var sizeData      = canvasData[position].numberData;
-	var Mean          = canvasData[position].mean;
-	var Deviation     = canvasData[position].deviation;
-	if (sizeExpressions < 10) {
+function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
+	if (sizeData < 1) {
 		jQuery('#heatmap_div').remove();
 		jQuery('#expression_div').html('<i>Expression scores are not available</i>');
 	} else {
@@ -58,18 +158,15 @@ function drawCanvas(position){
 		jQuery('#hierarchicalSelect').val('single');
 		jQuery('#kMenasSelect').val('3');
 
-		if (Deviation == 0) {
-			Deviation                        = getDeviation(dataForCanvas.y.data, sizeData, Mean);
-			dataForCanvas.y.data             = setZScores(dataForCanvas.y.data, Mean, Deviation);
-			max                              = getAZSCore(max, Mean, Deviation);
-			min                              = getAZSCore(min, Mean, Deviation) * (-1);
-			max                              = Math.ceil(max);
-			min                              = Math.ceil(min);
-			if (max < min) {max = min;}
-			canvasData[position].deviation   = Deviation;
-			canvasData[position].data.y.data = dataForCanvas.y.data;
-			canvasData[position].max         = max;
-			canvasData[position].min         = min;
+		var Deviation                    = getDeviation(dataForCanvas.y.data, sizeData, Mean);
+		dataForCanvas.y.data             = setZScores(dataForCanvas.y.data, Mean, Deviation);
+		max                              = getAZSCore(max, Mean, Deviation);
+		min                              = getAZSCore(min, Mean, Deviation) * (-1);
+		max                              = Math.ceil(max);
+		min                              = Math.ceil(min);
+
+		if (max < min) {
+			max = min;
 		}
 
 		// hm - heatmap; cl - cellline; ds - developmentalstage; hc - hierarchical clustering; km - kmeans
@@ -96,7 +193,7 @@ function drawCanvas(position){
 					if (o != undefined) {
 						var featureId    = o.y.smps;
 						var condition    = o.y.vars;
-						var query        = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue ExpressionValues.experiment.name ExpressionValues.gene.primaryIdentifier ExpressionValues.gene.secondaryIdentifier ExpressionValues.gene.symbol ExpressionValues.gene.name ExpressionValues.gene.organism.shortName" sortOrder="ExpressionValues.condition ASC" > <constraint path="ExpressionValues.condition" op="=" value="' + condition + '" code="A" /> <constraint path="ExpressionValues.experiment.name" op="=" value="' + title + '" code="B" /> <constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + featureId + '" /> </query>';
+						var query        = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue ExpressionValues.experiment.name ExpressionValues.gene.primaryIdentifier ExpressionValues.gene.secondaryIdentifier ExpressionValues.gene.symbol ExpressionValues.gene.name ExpressionValues.gene.organism.shortName" sortOrder="ExpressionValues.condition ASC" > <constraint path="ExpressionValues.condition" op="=" value="' + condition + '" code="A" /> <constraint path="ExpressionValues.experiment.name" op="=" value="' + title + '" code="B" /> <constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + featureId + '" /> <constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" /> </query>';
 						var encodedQuery = encodeURIComponent(query);
 						encodedQuery     = encodedQuery.replace("%20", "+");
 						window.open("/" + webAppPath + "/loadQuery.do?skipBuilder=true&query=" + encodedQuery + "%0A&trail=%7Cquery&method=xml");

@@ -37,14 +37,18 @@ import org.intermine.xml.full.Item;
 public class LabisGeneMetadataConverter extends BioFileConverter
 {
     //
-    private static final String DATASET_TITLE    = "Add DataSet.title here";
-    private static final String DATA_SOURCE_NAME = "Add DataSource.name here";
-    private static final String LOGFILE          = "/home/rodrigodorado/Documentos/MyJavaLog.log";
+    private static final String DATASET_TITLE       = "Add DataSet.title here";
+    private static final String DATA_SOURCE_NAME    = "Add DataSource.name here";
+    private static final String LOGFILE             = "/home/rodrigodorado/Documentos/MyJavaLog.log";
+    
+    private static Logger LOGGER                    = null;
+    
+    private Map<String, String> geneItems           = new HashMap<String, String>();
+    private Map<String, String> experimentItems     = new HashMap<String, String>();
+    private Map<String, String> typeDiccionaryItmes = new HashMap<String, String>();
 
-    private static Logger LOGGER                 = null;
-
-    private Map<String, String> geneItems        = new HashMap<String, String>();
-    private Map<String, String> experimentItems  = new HashMap<String, String>();
+    private String publication_id = "2055463";
+    private String publication_identifier = "";
 
 
     /**
@@ -63,55 +67,71 @@ public class LabisGeneMetadataConverter extends BioFileConverter
      * {@inheritDoc}
      */
     public void process(Reader reader) throws Exception {
+
+
         File currentFile   = getCurrentFile();
         String fileName    = currentFile.getName();
-        String TablesNames = "";
-        Iterator<?> tsvIter;
 
         makeLog("Start (" + fileName + ")");
+
+        Iterator<?> tsvIter;
         try {
             tsvIter = FormattedTextParser.parseTabDelimitedReader(reader);
         } catch (Exception e) {
             throw new BuildException("cannot parse file: " + getCurrentFile(), e);
         }
 
-        if (tsvIter.hasNext()) {
-            String[] line = (String[]) tsvIter.next();
-            if (line.length < 1) {
-                makeErrorLog(fileName, "Option not defined.");
-            } else {
-                if (line[0].equals("tables")) {
-                    if (line.length > 1) {
-                        TablesNames = line[1];
-                    } else {
-                        makeErrorLog(fileName, "Option not defined.");
-                    }
-                } else {
-                    makeErrorLog(fileName, "Option not defined.");
-                }
-            }
-        } else {
-           makeErrorLog(fileName, "File Empty.");
+        int opt = getOptionFileName(fileName);
+
+        switch(opt) {
+            case 1:
+                createPublication();
+                ExperimentDescriptionExecute(tsvIter, fileName);
+            break;
+            case 2:
+                ExpressionTypeDiccionaryExecute(tsvIter, fileName);
+            break;
+            case 3:
+                ExpressionValuesExecute(tsvIter, fileName);
+            break;
+            case 4:
+                ExperimentDescriptionColumnsExecute(tsvIter, fileName);
+            break;
+            default:
+                makeErrorLog(fileName, "Table Option incorrect.");
+            break;
         }
 
-        if (TablesNames.equals("ExpressionValues")) {
-            ExpressionValuesExecute(tsvIter, fileName);
-        } else {
-            if (TablesNames.equals("ExperimentDescription")) {
-                ExperimentDescriptionExecute(tsvIter, fileName);
-            } else {
-                makeErrorLog(fileName, "Table Option incorrect.");
-            }
-        }
         makeLog("End (" + fileName + ")");
     }
 
-    private void saveExpressionValues(String expressionValue, String condition, String primaryIdGenes, String primaryIdExperiment) throws Exception {
+    private int getOptionFileName(String fileName) {
+        if (fileName.indexOf("A-ExperimentDescription-") == 0) {
+            return 1;
+        }
+        if (fileName.indexOf("B-ExpressionTypeDiccionary-") == 0) {
+            return 2;
+        }
+        if (fileName.indexOf("C-ExpressionValues-") == 0) {
+            return 3;
+        }
+        if (fileName.indexOf("D-ExperimentDescriptionColumns-") == 0) {
+            return 4;
+        }
+        return 0;
+    }
+
+    private void saveExpressionValues(String expressionValue, String condition, String primaryIdGenes, String primaryIdExperiment, String typeDiccionary) throws Exception {
         Item score = createItem("ExpressionValues");
         score.setAttribute("expressionValue", expressionValue);
         score.setAttribute("condition", condition);
         score.setReference("gene", geneItems.get(primaryIdGenes));
-        score.setReference("experiment", experimentItems.get(primaryIdExperiment));
+        if (verifyExperiment(primaryIdExperiment)) {
+            score.setReference("experiment", experimentItems.get(primaryIdExperiment));
+        }
+        if (verifyTypeDicionary(typeDiccionary)) {
+            score.setReference("type", typeDiccionaryItmes.get(typeDiccionary));
+        }
         store(score);
     }
 
@@ -119,13 +139,87 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         Item score = createItem("ExperimentDescription");
         score.setAttribute("name", name);
         score.setAttribute("description", Decription);
-        //score.setReference("publication", "");
+        score.setReference("publication", publication_identifier);
         store(score);
         experimentItems.put(name, score.getIdentifier());
     }
 
+    private void saveExpressionType(String name) throws ObjectStoreException {
+        Item score = createItem("ExpressionTypeDiccionary");
+        score.setAttribute("name", name);
+        store(score);
+        typeDiccionaryItmes.put(name, score.getIdentifier());
+    }
+
+    private void saveExperimentDescriptionColumns(String columnName, String description, String primaryIdExperiment) throws ObjectStoreException {
+        Item score = createItem("ExperimentDescriptionColumns");
+        score.setAttribute("columnName", columnName);
+        score.setAttribute("description", description);
+        if (verifyExperiment(primaryIdExperiment)) {
+            score.setReference("experiment", experimentItems.get(primaryIdExperiment));
+        }
+        store(score);
+    }
+
+    private void ExperimentDescriptionColumnsExecute(Iterator tsvIter, String fileName) throws Exception {
+        int end         = 0;
+
+        if (tsvIter.hasNext()) {
+            String[] line = (String[]) tsvIter.next();
+            if (line.length < 1) {
+                makeErrorLog(fileName, "No data.");
+            } else {
+                if (!StringUtils.isBlank(line[0])) {
+                    end++;
+                }
+            }
+        }
+
+        if (end > 0) {
+            while (tsvIter.hasNext()) {
+                String[] line              = (String[]) tsvIter.next();
+                String primaryIdExperiment = (line.length > 0) ? line[0] : "";
+                String Name                = (line.length > 1) ? line[1] : "";
+                String description         = (line.length > 2) ? line[2] : "";
+                if (StringUtils.isBlank(Name) == false) {
+                    saveExperimentDescriptionColumns(Name, description, primaryIdExperiment);
+                }
+            }
+        } else {
+            makeErrorLog(fileName, "File Empty of data.");
+        }
+    }
+
+    private void ExpressionTypeDiccionaryExecute(Iterator tsvIter, String fileName) throws Exception {
+       int end = 0;
+
+        if (tsvIter.hasNext()) {
+            String[] line = (String[]) tsvIter.next();
+            if (line.length < 1) {
+                makeErrorLog(fileName, "No data.");
+            } else {
+                if (!StringUtils.isBlank(line[0])) {
+                    end++;
+                }
+            }
+        }
+
+        if (end > 0) {
+            while (tsvIter.hasNext()) {
+                String[] line      = (String[]) tsvIter.next();
+                String name        = (line.length > 0) ? line[0] : "";
+                if (StringUtils.isBlank(name) == false) {
+                    saveExpressionType(name);
+                }
+            }
+        } else {
+            makeErrorLog(fileName, "File Empty of data.");
+        }
+    }
+
     private void ExperimentDescriptionExecute(Iterator tsvIter, String fileName) throws Exception {
         int end = 0;
+
         if (tsvIter.hasNext()) {
             String[] line = (String[]) tsvIter.next();
             if (line.length < 1) {
@@ -173,15 +267,15 @@ public class LabisGeneMetadataConverter extends BioFileConverter
            makeErrorLog(fileName, "File Empty of data.");
         }
 
-
         while (tsvIter.hasNext()) {
             String[] line              = (String[]) tsvIter.next();
             String primaryIdGenes      = line[0];
             String primaryIdExperiment = line[1];
+            String typeDiccionary      = line[2];
             createBioEntity(primaryIdGenes);
-            createExpEntity(primaryIdExperiment);
-            for (int i = 2; i < end; i++) {
-                saveExpressionValues(line[i], heads[i], primaryIdGenes, primaryIdExperiment);
+            //createExpEntity(primaryIdExperiment);
+            for (int i = 3; i < end; i++) {
+                saveExpressionValues(line[i], heads[i], primaryIdGenes, primaryIdExperiment, typeDiccionary);
             }
         }
     }
@@ -196,10 +290,12 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         }
     }
 
-    private void createExpEntity(String name) throws ObjectStoreException {
-        if (!experimentItems.containsKey(name)) {
-            saveExperimentDescription(name, "");
-        }
+    private boolean verifyExperiment(String name) throws ObjectStoreException {
+        return experimentItems.containsKey(name);
+    }
+
+    private boolean verifyTypeDicionary(String name) throws ObjectStoreException {
+        return typeDiccionaryItmes.containsKey(name);
     }
 
     protected void setFileHandler() throws IOException{
@@ -220,4 +316,11 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         LOGGER.info(logger);
     }
 
+    private void createPublication() throws ObjectStoreException {
+        Item pub               = null;
+        pub                    = createItem("Publication");
+        pub.setAttribute("pubMedId", publication_id);
+        store(pub);
+        publication_identifier = pub.getIdentifier();
+    }
 }

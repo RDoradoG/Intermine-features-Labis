@@ -4,8 +4,6 @@
 <%@ page import="java.net.URLEncoder" language="java" %>
 
 <!-- heatMap.jsp -->
-<!-- pollo -->
-<!-- ${pollo} -->
 <html:xhtml />
 
 <tiles:importAttribute />
@@ -37,12 +35,6 @@ jQuery(document).ready(function () {
 <c:set var="MAX_CLUSTER" value="250" />
 <c:set var="MAX_MAP" value="600" />
 <c:set var="MAX_DEFAULT_OPEN" value="100" />
-
-<%--
-<hr>
-${expressionScoreJSON}
-<hr>
---%>
     <div id="heatmap_div">
         <p>
           <h2>
@@ -88,6 +80,10 @@ ${expressionScoreJSON}
               <tr>
                 <td>
                     <div style="padding: 0px 0px 5px 30px;">
+                      
+                      <span>Type:</span>
+                      <select id="experimentType"></select>
+
                       <span>Experiment:</span>
                       <select id="experimentSelect"></select>
                       <span>Cell Line Clustering - Hierarchical:</span>
@@ -103,7 +99,7 @@ ${expressionScoreJSON}
                     </div>
                     <div id="set_canvas">
                       <canvas id="canvas_cl" width="700" height="550"></canvas>
-                    </div>
+                    </div>                      
                 </td>
               </tr>
             </table>
@@ -135,16 +131,21 @@ modENCODE submission</a>, with links to the original score files for <a href="ht
 </div>
 </div>
 
-
 <script type="text/javascript">
+  var types           = ${type};
+  var Genes           = ${gene};
+  var bagName         = '${ListName}';
+  var webAppPath      = "${WEB_PROPERTIES['webapp.path']}";
+  var api_key         = '${APIKey}';
   var feature_count   = parseInt(${FeatureCount});
   var max_cluster     = parseInt(${MAX_CLUSTER});
   var max_map         = parseInt(${MAX_MAP});
-  var sizeExpressions = parseInt(${fn:length(expressionScoreJSON)});
-  var canvasData      = ${expressionScoreJSON};
-  var JsonExepriemnts = ${JsonExepriemnts};
-  var webAppPath      = "${WEB_PROPERTIES['webapp.path']}";
+  
+  var typeSelected    = '';
+  var experiment      = '';
+  var arrayConditions = [];
 </script>
+<script src="model/js/libraryIntermine.js" charset="UTF-8"></script>
 <script type="text/javascript" src="model/js/heatMap.js"></script>
 
 <!-- /heatMap.jsp -->
