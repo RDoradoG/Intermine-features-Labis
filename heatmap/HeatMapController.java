@@ -1,24 +1,10 @@
 package org.phycomine.web;
 
-/*
- * Copyright (C) 2002-2014 FlyMine
- *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  See the LICENSE file for more
- * information or http://www.gnu.org/copyleft/lesser.html.
- *
- */
-//import java.text.DecimalFormat;
-
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-//import java.util.LinkedHashMap;
-//import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -46,9 +32,6 @@ import org.intermine.pathquery.PathQuery;
 import org.intermine.web.logic.session.SessionMethods;
 import org.intermine.webservice.client.core.ServiceFactory;
 import org.intermine.webservice.client.services.QueryService;
-
-//import org.json.JSONObject;
-
 /**
  * Class that generates heatMap data for a list of genes.
  *
