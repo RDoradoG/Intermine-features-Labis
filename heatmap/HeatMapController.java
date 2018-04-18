@@ -1,4 +1,4 @@
-package org.malariamine.web;
+package org.phycomine.web;
 
 /*
  * Copyright (C) 2002-2014 FlyMine
