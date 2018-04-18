@@ -37,10 +37,10 @@ function drawGeneAtlasChart(expressionValues, useLinearScale, orderBy) {
       {
       	isStacked: true,
 				colors: ['#314bbc','#8931bc','#bc3162'],
-				title: "Gene Atlas Expression By Tissue",
+				title: "Gene Atlas Expression",
 				width: 920, height: height,
 				legendTextStyle: {fontSize: 10},
-				vAxis: {title: "Tissue Name", textStyle: {fontSize: 11}},
+				vAxis: {title: "Conditions Name", textStyle: {fontSize: 11}},
 				hAxis: {title: haxis, logScale: useLogScaleOption, maxValue: maxH, baseline: baseLine, baselineColor: '#8931bc'},
       }
     );
