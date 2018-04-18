@@ -1,4 +1,4 @@
-package org.malariamine.web.displayer;
+package org.phycomine.web.displayer;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpServletRequest;
