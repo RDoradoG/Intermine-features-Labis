@@ -14,7 +14,7 @@ function drawGeneAtlasChart(expressionValues, useLinearScale, orderBy) {
    auxExpressionValues = getDataForvisualization(auxExpressionValues, 'ExpressionValues.expressionValue', zscored);
 
 	for (var i = 0; i < auxExpressionValues.length; i++) {
-		var enrichment_row = [auxExpressionValues[i]['ExpressionValues.condition'], auxExpressionValues[i]['ExpressionValues.expressionValue']];
+		var enrichment_row = [auxExpressionValues[i]['ExpressionValues.condition'].value, auxExpressionValues[i]['ExpressionValues.expressionValue'].value];
 		enrichment_data.addRow(enrichment_row);
 	}
 
@@ -40,7 +40,7 @@ function drawGeneAtlasChart(expressionValues, useLinearScale, orderBy) {
 				title: "Gene Atlas Expression",
 				width: 920, height: height,
 				legendTextStyle: {fontSize: 10},
-				vAxis: {title: "Conditions Name", textStyle: {fontSize: 11}},
+				vAxis: {title: "Condition Name", textStyle: {fontSize: 11}},
 				hAxis: {title: haxis, logScale: useLogScaleOption, maxValue: maxH, baseline: baseLine, baselineColor: '#8931bc'},
       }
     );
@@ -77,11 +77,11 @@ function filTypeExperiment(result) {
 	var selected = true;
 	jQuery('#experimentSelect').html('');
 	for (var i = 0; i < result.length; i++) {
-		fillAOption('experimentSelect', result[i]['ExperimentDescription.name'], selected);
+		fillAOption('experimentSelect', result[i]['ExperimentDescription.name'].value, selected);
 		selected = false;
 	}
 	if (!selected) {
-		ChangeExepreiment(result[0]['ExperimentDescription.name']);
+		ChangeExepreiment(result[0]['ExperimentDescription.name'].value);
 	}
 }
 
@@ -152,7 +152,7 @@ function getDataForvisualization(arrayValues, key, zscored) {
 function getMean(arrayData, key) {
 	var sum = 0;
 	for (var i = 0; i < arrayData.length; i++) {
-		sum += arrayData[i][key];
+		sum += arrayData[i][key].value;
 	}
 	return sum / arrayData.length;
 }
@@ -160,7 +160,7 @@ function getMean(arrayData, key) {
 function getDeviation(arrayData, key, Mean) {
 	var sum = 0;
 	for (var i = 0; i < arrayData.length; i++) {
-		aux = (arrayData[i][key] - Mean);
+		aux = (arrayData[i][key].value - Mean);
 		sum = sum + (aux * aux);
 	}
 	return Math.sqrt(sum / arrayData.length);
@@ -168,7 +168,7 @@ function getDeviation(arrayData, key, Mean) {
 
 function setZScores(arrayData, key, Mean, Deviation) {
 	for (var i = 0; i < arrayData.length; i++) {
-		arrayData[i][key] = getAZSCore(arrayData[i][key], Mean, Deviation);
+		arrayData[i][key].value = getAZSCore(arrayData[i][key].value, Mean, Deviation);
 	}
 	return arrayData;
 }

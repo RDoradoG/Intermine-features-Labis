@@ -134,6 +134,7 @@ modENCODE submission</a>, with links to the original score files for <a href="ht
 <script type="text/javascript">
   var types           = ${type};
   var Genes           = ${gene};
+  var defaultValues   = ${defaultValues};
   var bagName         = '${ListName}';
   var webAppPath      = "${WEB_PROPERTIES['webapp.path']}";
   var api_key         = '${APIKey}';

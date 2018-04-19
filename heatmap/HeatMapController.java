@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -32,6 +33,7 @@ import org.intermine.pathquery.PathQuery;
 import org.intermine.web.logic.session.SessionMethods;
 import org.intermine.webservice.client.core.ServiceFactory;
 import org.intermine.webservice.client.services.QueryService;
+
 /**
  * Class that generates heatMap data for a list of genes.
  *
@@ -40,6 +42,10 @@ import org.intermine.webservice.client.services.QueryService;
  */
 public class HeatMapController extends TilesAction
 {
+
+    private String Type_selected = "";
+    private String Experiment_selected = "";
+
     /**
      * {@inheritDoc}
      */
@@ -123,12 +129,15 @@ public class HeatMapController extends TilesAction
 
         JsonGene = "[" + JsonGene + "]";
 
+        String defaultValues = getDefault(bag, model, executor);
+
         request.setAttribute("type", JsonType);
         request.setAttribute("gene", JsonGene);
         request.setAttribute("FeatureCount", bag.getSize());
         request.setAttribute("ListName", bag.getName());
         request.setAttribute("ExpressionType", expressionType);
         request.setAttribute("APIKey", token);
+        request.setAttribute("defaultValues", defaultValues);
     }
 
     private String addToJsonList(String value, String addition) {
@@ -153,5 +162,83 @@ public class HeatMapController extends TilesAction
         query.addOrderBy("ExpressionTypeDiccionary.name", OrderDirection.ASC);
         query.addConstraint(Constraints.in("ExpressionTypeDiccionary.ExpressionValue.gene", bag.getName()));
         return query;
+    }
+
+    private PathQuery queryConditions(InterMineBag bag, Model model, String type, String experiment) {
+        PathQuery query = new PathQuery(model);
+        query.addView("ExpressionValues.condition");
+        query.addOrderBy("ExpressionValues.condition", OrderDirection.ASC);
+        query.addConstraint(Constraints.in("ExpressionValues.gene", bag.getName()), "A");
+        query.addConstraint(Constraints.eq("ExpressionValues.experiment.name", experiment), "B");
+        query.addConstraint(Constraints.eq("ExpressionValues.type.name", type), "C");
+        query.setConstraintLogic("A and B and C");
+        return query;
+    }
+
+    private  PathQuery getListPOfTypeExperiment(InterMineBag bag, Model model) {
+        PathQuery query = new PathQuery(model);
+        query.addViews("ExpressionTypeDiccionary.name", "ExpressionTypeDiccionary.ExpressionValue.experiment.name");
+        query.addOrderBy("ExpressionTypeDiccionary.name", OrderDirection.ASC);
+        query.addConstraint(Constraints.in("ExpressionTypeDiccionary.ExpressionValue.gene", bag.getName()));
+        return query;
+    }
+
+    private int getCountofConditions(InterMineBag bag, Model model, String type, String experiment, PathQueryExecutor executor) {
+        PathQuery queryConditions = queryConditions(bag, model, type, experiment);
+
+        ExportResultsIterator resultConditions;
+        try {
+            resultConditions = executor.execute(queryConditions);
+        } catch (ObjectStoreException e) {
+            throw new RuntimeException("Error retrieving data.", e);
+        }
+
+        int count = 0;
+
+        while (resultConditions.hasNext()) {
+            List<ResultElement> rowConditions = resultConditions.next();
+            count++;            
+        }
+
+        return count;
+    }
+
+    private void chooseTypeExperiment(String type, String experiment) {
+        Type_selected = type;
+        Experiment_selected = experiment;
+    }
+
+    private String getJsonChoosedTypeExperiment() {
+        return "{type: '" + Type_selected + "', experiment: '" + Experiment_selected + "'}";
+    }
+
+    private String getDefault(InterMineBag bag, Model model, PathQueryExecutor executor) {
+        PathQuery queryListPOfTypeExperiment = getListPOfTypeExperiment(bag, model);
+
+        ExportResultsIterator resultListPOfTypeExperiment;
+        try {
+            resultListPOfTypeExperiment = executor.execute(queryListPOfTypeExperiment);
+        } catch (ObjectStoreException e) {
+            throw new RuntimeException("Error retrieving data.", e);
+        }
+
+        int less = 1000;
+
+        while (resultListPOfTypeExperiment.hasNext()) {
+            List<ResultElement> rowListPOfTypeExperiment = resultListPOfTypeExperiment.next();
+            String Type = (String) rowListPOfTypeExperiment.get(0).getField();
+            String Experiment = (String) rowListPOfTypeExperiment.get(1).getField();
+            int count = getCountofConditions(bag, model, Type, Experiment, executor);
+            if (Type_selected.equals("") || Experiment_selected.equals("")) {
+                less = count;
+                chooseTypeExperiment(Type, Experiment);
+            } else {
+                if (count < less) {
+                    less = count;
+                    chooseTypeExperiment(Type, Experiment);
+                }
+            }
+        }
+        return getJsonChoosedTypeExperiment();
     }
 }

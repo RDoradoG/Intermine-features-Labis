@@ -19,7 +19,7 @@ function APIExecuteQuery(query, idCall, sz, strt) {
 	}
 
 	jQuery.ajax(settings).done(function (response) {
-		var result = getResultFormat(response);
+	  var result = getResultFormat(response);
 	  getResult(result, idCall);
 	});
 }
@@ -31,7 +31,12 @@ function getResultFormat(response) {
 	for (var i = 0; i < response.results.length; i++) {
 		row = {};
 		for (var j = 0; j < response.results[i].length; j++) {
-			row[response.results[i][j].column] = response.results[i][j].value;
+			row[response.results[i][j].column] = {
+				value: response.results[i][j].value,
+				id: response.results[i][j].id,
+				class: response.results[i][j].class,
+				url: response.results[i][j].url
+			};
 		}
 		result.push(row);
 	}
