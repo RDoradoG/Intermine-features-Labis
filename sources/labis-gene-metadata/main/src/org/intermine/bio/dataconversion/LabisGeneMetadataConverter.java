@@ -39,7 +39,7 @@ public class LabisGeneMetadataConverter extends BioFileConverter
     //
     private static final String DATASET_TITLE       = "Add DataSet.title here";
     private static final String DATA_SOURCE_NAME    = "Add DataSource.name here";
-    private static final String LOGFILE             = "/home/rodrigodorado/Documentos/MyJavaLog.log";
+    private static final String LOGFILE             = "/home/rodrigodorado/Documents/MyJavaLog.log";
     
     private static Logger LOGGER                    = null;
     
@@ -269,12 +269,16 @@ public class LabisGeneMetadataConverter extends BioFileConverter
 
         while (tsvIter.hasNext()) {
             String[] line              = (String[]) tsvIter.next();
+            int sizeLine = line.length;
             String primaryIdGenes      = line[0];
             String primaryIdExperiment = line[1];
             String typeDiccionary      = line[2];
             createBioEntity(primaryIdGenes);
             //createExpEntity(primaryIdExperiment);
             for (int i = 3; i < end; i++) {
+                if (i >= sizeLine) {
+                    break;
+                }
                 saveExpressionValues(line[i], heads[i], primaryIdGenes, primaryIdExperiment, typeDiccionary);
             }
         }

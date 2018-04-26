@@ -1,7 +1,5 @@
 //Autor: Rodrigo Dorado
 
-console.log(defaultValues);
-
 fillTypeExperiment();
 
 function fillTypeExperiment() {
@@ -95,15 +93,37 @@ function getArrayData(result) {
 	var sum        = 0;
 	var max        = 0;
 	var min        = 0;
+
+	var iGenes = 0;
+
 	if (result.length > 0) {
 		max = min = sum = result[0]['ExpressionValues.expressionValue'].value;
+		while (result[0]['ExpressionValues.gene.primaryIdentifier'].value != Genes[iGenes]) {
+			rowCanvas.push(NaN);
+			iGenes++;
+		}
 		rowCanvas.push(sum);
+		iGenes++;
 		for (var i = 1; i < result.length; i++) {
 			if (result[i]['ExpressionValues.condition'].value != result[i - 1]['ExpressionValues.condition'].value) {
+				//verify null
+				while (iGenes < Genes.length) {
+					rowCanvas.push(NaN);
+					iGenes++;
+				}
+				iGenes = 0;
+				//verify null
 				dataCanvas.push(rowCanvas);
 				rowCanvas = [];
 			}
 			var field = result[i]['ExpressionValues.expressionValue'].value;
+			//verify null
+			while (result[i]['ExpressionValues.gene.primaryIdentifier'].value != Genes[iGenes]) {
+				rowCanvas.push(NaN);
+				iGenes++;
+			}
+			iGenes++;
+			//verify null
 			rowCanvas.push(field);
 			sum       = sum + field;
 			if(field > max) {max = field;}
@@ -205,6 +225,7 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
 					setMax: max,
 					varLabelRotate: 45,
 					centerData: false,
+					missingDataColor: 'rgb(255, 255, 0)',
 					//colorSpectrum: ['#920000', '#009292'],
 					autoExtend: true
 				},
@@ -264,8 +285,10 @@ function getDeviation(arrayData, sizeData, Mean) {
 	var sum = 0;
 	for (var i = 0; i < arrayData.length; i++) {
 		for (var j = 0; j < arrayData[i].length; j++) {
-			aux = (arrayData[i][j] - Mean);
-			sum = sum + (aux * aux);
+			if (!isNaN(arrayData[i][j])) {
+				aux = (arrayData[i][j] - Mean);
+				sum = sum + (aux * aux);
+			}
 		}
 	}
 	return Math.sqrt(sum / sizeData);
@@ -274,7 +297,9 @@ function getDeviation(arrayData, sizeData, Mean) {
 function setZScores(arrayData, Mean, Deviation) {
 	for (var i = 0; i < arrayData.length; i++) {
 		for (var j = 0; j < arrayData[i].length; j++) {
-			arrayData[i][j] = getAZSCore(arrayData[i][j], Mean, Deviation);
+			if (!isNaN(arrayData[i][j])) {
+				arrayData[i][j] = getAZSCore(arrayData[i][j], Mean, Deviation);
+			}
 		}
 	}
 	return arrayData;

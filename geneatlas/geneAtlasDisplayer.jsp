@@ -45,7 +45,6 @@
   var PrimaryIdentifier = '${getPrimaryIdentifier}';
   var TypesDiccionary   = ${TypeDiccionary};
   var api_key           = '${ApiKey}';
-
   var typeSelected     = '';
   var experiment       = '';
   var useLinearScale   = 'normal';
