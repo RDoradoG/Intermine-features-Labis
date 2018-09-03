@@ -123,7 +123,8 @@ public class HeatMapController extends TilesAction
             if (symbol == null) {
                 symbol = primaryIdentifier;
             }
-            String additon  =  "'" + symbol + "'";
+            //String additon  =  "'" + symbol + "'";
+            String additon  =  "'" + primaryIdentifier + "'";
             JsonGene = addToJsonList(JsonGene, additon);
         }
 

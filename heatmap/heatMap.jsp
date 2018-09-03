@@ -15,6 +15,7 @@
 
 <script type="text/javascript" charset="utf-8">
 jQuery(document).ready(function () {
+    jQuery("#idSecundary").toggle("slow");
     var feature_count = parseInt(${FeatureCount});
     if (feature_count > 100) {
         jQuery("#heatmapGraph").hide();
@@ -28,6 +29,15 @@ jQuery(document).ready(function () {
          jQuery("#oc").attr("src", "images/undisclosed.gif");
        }
        jQuery("#heatmapGraph").toggle("slow");
+    });
+
+    jQuery("#brosecundary").click(function () {
+       if(jQuery("#idSecundary").is(":hidden")) {
+         jQuery("#ocsecundary").attr("src", "images/disclosed.gif");
+       } else {
+         jQuery("#ocsecundary").attr("src", "images/undisclosed.gif");
+       }
+       jQuery("#idSecundary").toggle("slow");
     });
 })
 </script>
@@ -104,6 +114,44 @@ jQuery(document).ready(function () {
               </tr>
             </table>
         </div>
+
+        <div>
+          <html:link linkName="#" styleId="brosecundary" style="cursor:pointer">
+            <h3>
+            <b>Click to see/hide</b> the secundary expression maps<img src="images/undisclosed.gif" id="ocsecundary"></h3>
+          </html:link>
+        </div>
+
+        <div id="idSecundary" style="display: block">
+          <table>
+            <tr>
+              <td>
+                  <div style="padding: 0px 0px 5px 30px;">
+                    
+                    <span>Type:</span>
+                    <select id="experimentType_secundary"></select>
+
+                    <span>Experiment:</span>
+                    <select id="experimentSelect_secundary"></select>
+                    <span>Cell Line Clustering - Hierarchical:</span>
+                    <select id="hierarchicalSelect_secundary">
+                      <option value="single" selected="selected">Single</option>
+                      <option value="complete">Complete</option>
+                      <option value="average">Average</option>
+                    </select>
+                    <span> and K-means:</span>
+                    <select id="kMenasSelect_secundary">
+                      <option value="3" selected="selected">3</option>
+                    </select>
+                  </div>
+                  <div id="set_canvas_secundary">
+                    <canvas id="canvas_cl_secundary" width="700" height="550"></canvas>
+                  </div>                      
+              </td>
+            </tr>
+          </table>
+        </div>
+
         <div id="description_div">
             <table border="0">
                 <tr>

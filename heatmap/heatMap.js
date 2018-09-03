@@ -1,37 +1,39 @@
 //Autor: Rodrigo Dorado
 
-fillTypeExperiment();
+fillTypeExperiment('');
 
-function fillTypeExperiment() {
+fillTypeExperiment('_secundary');
+
+function fillTypeExperiment(addId) {
 	var selected_type = ''; 
 	for (var i = 0; i < types.length; i++) {
 		if (types[i].name == defaultValues.type) {
-			fillAOption('experimentType', types[i].name, true);
+			fillAOption('experimentType' + addId, types[i].name, true);
 			selected_type = types[i].name;
 		} else {
-			fillAOption('experimentType', types[i].name, false);
+			fillAOption('experimentType' + addId, types[i].name, false);
 		}
 	}
 	if (selected_type != '') {
-		ChangeExperimentType(selected_type);
+		ChangeExperimentType(selected_type, addId);
 	}
 }
 
-function filTypeExperiment(result) {
+function filTypeExperiment(result, addID) {
 	var selected_experiment = '';
-	jQuery('#experimentSelect').html('');
+	jQuery('#experimentSelect' + addID).html('');
 	for (var i = 0; i < result.length; i++) {
 		if (result[i]['ExperimentDescription.name'].value == defaultValues.experiment) {
-			fillAOption('experimentSelect', result[i]['ExperimentDescription.name'].value, true);
+			fillAOption('experimentSelect' + addID, result[i]['ExperimentDescription.name'].value, true);
 			selected_experiment = result[i]['ExperimentDescription.name'].value;
 		} else {
-			fillAOption('experimentSelect', result[i]['ExperimentDescription.name'].value, false);
+			fillAOption('experimentSelect' + addID, result[i]['ExperimentDescription.name'].value, false);
 		}
 	}
 	if (selected_experiment != '') {
-		ChangeExepreiment(selected_experiment);
+		ChangeExepreiment(selected_experiment, addID);
 	} else {
-		ChangeExepreiment(result[0]['ExperimentDescription.name'].value);
+		ChangeExepreiment(result[0]['ExperimentDescription.name'].value, addID);
 	}
 }
 
@@ -45,24 +47,34 @@ function fillAOption(id, value, selected) {
 
 
 jQuery('#experimentType').change(function() {
-	ChangeExperimentType(this.value);
+	ChangeExperimentType(this.value, '');
 });
 
 jQuery('#experimentSelect').change(function() {
-	ChangeExepreiment(this.value);
+	ChangeExepreiment(this.value, '');
 });
 
-function ChangeExepreiment(value) {
+jQuery('#experimentType_secundary').change(function() {
+	ChangeExperimentType(this.value, '_secundary');
+});
+
+jQuery('#experimentSelect_secundary').change(function() {
+	ChangeExepreiment(this.value, '_secundary');
+});
+
+
+function ChangeExepreiment(value, addID) {
 	experiment = value;
-	getConditions();
+	getConditions(addID);
 }
 
-function getConditions() {
+function getConditions(addID) {
 	var query = '<query model="genomic" view="ExpressionValues.condition" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="B" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" /></query>';
-	APIExecuteQuery(query, 'conditionsOfBag');
+	//APIExecuteQuery(query, 'conditionsOfBag');
+	APIExecuteQuery(query, {key: 'conditionsOfBag', addID: addID});
 }
 
-function setConditions(result) {
+function setConditions(result, addID) {
 	arrayConditions = [];
 	if (result.length > 0) {
 		arrayConditions.push(result[0]['ExpressionValues.condition'].value);
@@ -72,22 +84,24 @@ function setConditions(result) {
 			}
 		}
 	}
-	getExpressionValues()
+	getExpressionValues(addID)
 
 }
 
-function getExpressionValues() {
+function getExpressionValues(addID) {
 	var query = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue ExpressionValues.gene.primaryIdentifier" sortOrder="ExpressionValues.condition ASC ExpressionValues.gene.primaryIdentifier ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="B" /><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="C" /></query>';
-	APIExecuteQuery(query, 'ExpressionValues');
+	//APIExecuteQuery(query, 'ExpressionValues');
+	APIExecuteQuery(query, {key: 'ExpressionValues', addID: addID});
 }
 
-function ChangeExperimentType(value) {
+function ChangeExperimentType(value, addID) {
 	typeSelected = value;
 	var query ='<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" constraintLogic="A and B" ><constraint path="ExperimentDescription.ExpressionValue.type.name" op="=" value="' + typeSelected + '" code="A" /><constraint path="ExperimentDescription.ExpressionValue.gene" op="IN" value="' + bagName + '" code="B" /></query>';
-	APIExecuteQuery(query, 'typeExperiment');
+	//APIExecuteQuery(query, 'typeExperiment');
+	APIExecuteQuery(query, {key: 'typeExperiment', addID: addID});
 }
 
-function getArrayData(result) {
+function getArrayData(result, addID) {
 	var dataCanvas = [];
 	var rowCanvas  = [];
 	var sum        = 0;
@@ -142,23 +156,25 @@ function getArrayData(result) {
 			data: dataCanvas
 		}
 	};
-	jQuery('#set_canvas').html('');
-	jQuery('#set_canvas').html('<canvas id="canvas_cl" width="700" height="550"></canvas>');
-	drawCanvas(dataForCanvas, mean, max, min, result.length, experiment);
+	var idCanvasHTML = "canvas_cl" + addID
+	jQuery('#set_canvas' + addID).html('');
+	jQuery('#set_canvas' + addID).html('<canvas id="' + idCanvasHTML + '" width="700" height="550"></canvas>');
+	drawCanvas(dataForCanvas, mean, max, min, result.length, experiment, addID);
 }
 
 function getResult(result, idFunction) {
-	switch(idFunction) {
+	//{key: 'typeExperiment', addID: addID}
+	switch(idFunction.key) {
 		case 'typeExperiment':
-			filTypeExperiment(result);
+			filTypeExperiment(result, idFunction.addID);
 		break;
 
 		case 'conditionsOfBag':
-			setConditions(result)
+			setConditions(result, idFunction.addID)
 		break;
 
 		case 'ExpressionValues':
-			getArrayData(result)
+			getArrayData(result, idFunction.addID)
 		break;
 
 		case 'getURL':
@@ -176,7 +192,7 @@ function getURL(result) {
 	}
 }
 
-function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
+function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title, addID){
 	if (sizeData < 1) {
 		jQuery('#heatmap_div').remove();
 		jQuery('#expression_div').html('<i>Expression scores are not available</i>');
@@ -195,8 +211,8 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
 					jQuery("#description").toggle("slow");
 			});
 
-			jQuery('#hierarchicalSelect').val('single');
-			jQuery('#kMenasSelect').val('3');
+			jQuery('#hierarchicalSelect' + addID).val('single');
+			jQuery('#kMenasSelect' + addID).val('3');
 
 			var Deviation                    = getDeviation(dataForCanvas.y.data, sizeData, Mean);
 			dataForCanvas.y.data             = setZScores(dataForCanvas.y.data, Mean, Deviation);
@@ -212,7 +228,7 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
 			// hm - heatmap; cl - cellline; ds - developmentalstage; hc - hierarchical clustering; km - kmeans
 			min = max * (-1);
 			var hm_cl = new CanvasXpress(
-				'canvas_cl',
+				'canvas_cl' + addID,
 				dataForCanvas,
 				{
 					graphType: 'Heatmap',
@@ -234,7 +250,8 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
 						if (o != undefined) {
 							var featureId    = o.y.smps;
 							var query        = '<query model="genomic" view="Gene.primaryIdentifier" sortOrder="Gene.primaryIdentifier ASC" ><constraint path="Gene.primaryIdentifier" op="=" value="' + featureId + '" code="A" /></query>';
-							APIExecuteQuery(query, 'getURL');
+							//APIExecuteQuery(query, 'getURL');
+							APIExecuteQuery(query, {key: 'getURL', addID: addID});
 						}
 					}
 				}
@@ -242,21 +259,21 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
 
 			// cluster on gene/exons
 			if (feature_count > max_cluster) {
-				jQuery("#hierarchicalSelect").attr('disabled', true);
+				jQuery("#hierarchicalSelect" + addID).attr('disabled', true);
 			}
 
-			jQuery('#kMenasSelect').html('<option value="3" selected="selected">3</option>');
+			jQuery('#kMenasSelect' + addID).html('<option value="3" selected="selected">3</option>');
 			if (feature_count > 3 && feature_count <= max_cluster) {
 				hm_cl.clusterSamples();
 				hm_cl.kmeansSamples();
 				for (var i=4; i < feature_count; ++i) {
-					jQuery('#kMenasSelect').
+					jQuery('#kMenasSelect' + addID).
 					append(jQuery("<option></option>").
 					attr("value",i).
 					text(i));
 				}
 			} else {
-				jQuery("#kMenasSelect").attr('disabled', true);
+				jQuery("#kMenasSelect" + addID).attr('disabled', true);
 			}
 
 			// cluster on conditions
@@ -265,14 +282,14 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title){
 				hm_cl.draw();
 			}
 
-			jQuery('#hierarchicalSelect').change(function() {
+			jQuery('#hierarchicalSelect' + addID).change(function() {
 				hm_cl.linkage = this.value;
 				if (feature_count >= 3) { hm_cl.clusterSamples(); }
 				hm_cl.clusterVariables();
 				hm_cl.draw();
 			});
 
-			jQuery('#kMenasSelect').change(function() {
+			jQuery('#kMenasSelect' + addID).change(function() {
 				hm_cl.kmeansClusters = parseInt(this.value);
 				hm_cl.kmeansSamples();
 				hm_cl.draw();
