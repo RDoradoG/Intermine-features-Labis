@@ -39,13 +39,19 @@ public class LabisGeneMetadataConverter extends BioFileConverter
     //
     private static final String DATASET_TITLE       = "Add DataSet.title here";
     private static final String DATA_SOURCE_NAME    = "Add DataSource.name here";
-    private static final String LOGFILE             = "/home/rodrigodorado/Documents/MyJavaLog.log";
+    private static final String LOGFILE             = "/home/rdorado/logs/MyJavaLog.log";
     
     private static Logger LOGGER                    = null;
     
     private Map<String, String> geneItems           = new HashMap<String, String>();
     private Map<String, String> experimentItems     = new HashMap<String, String>();
     private Map<String, String> typeDiccionaryItmes = new HashMap<String, String>();
+
+    /** start 04-sep-2018 */
+        
+    private Map<String, String> verifyConditionItems = new HashMap<String, String>();
+
+    /** fin 04-sep-2018 */
 
     private String publication_id = "2055463";
     private String publication_identifier = "";
@@ -112,20 +118,35 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         if (fileName.indexOf("B-ExpressionTypeDiccionary-") == 0) {
             return 2;
         }
-        if (fileName.indexOf("C-ExpressionValues-") == 0) {
+        /*if (fileName.indexOf("C-ExpressionValues-") == 0) {
             return 3;
         }
         if (fileName.indexOf("D-ExperimentDescriptionColumns-") == 0) {
             return 4;
+        }*/
+        /** start 04-sep-2018 */
+        if (fileName.indexOf("C-ExperimentDescriptionColumns-") == 0) {
+            return 4;
         }
+        if (fileName.indexOf("D-ExpressionValues-") == 0) {
+            return 3;
+        }
+        /** fin 04-sep-2018 */
         return 0;
     }
 
     private void saveExpressionValues(String expressionValue, String condition, String primaryIdGenes, String primaryIdExperiment, String typeDiccionary) throws Exception {
         Item score = createItem("ExpressionValues");
         score.setAttribute("expressionValue", expressionValue);
-        score.setAttribute("condition", condition);
         score.setReference("gene", geneItems.get(primaryIdGenes));
+
+        /** start 04-sep-2018 */
+        if (verifyCondition(condition)) {
+            score.setReference("condition", verifyConditionItems.get(condition));
+        }
+        //score.setAttribute("condition", condition);
+        /** fin 04-sep-2018 */
+
         if (verifyExperiment(primaryIdExperiment)) {
             score.setReference("experiment", experimentItems.get(primaryIdExperiment));
         }
@@ -151,14 +172,32 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         typeDiccionaryItmes.put(name, score.getIdentifier());
     }
 
-    private void saveExperimentDescriptionColumns(String columnName, String description, String primaryIdExperiment) throws ObjectStoreException {
-        Item score = createItem("ExperimentDescriptionColumns");
-        score.setAttribute("columnName", columnName);
+    private void saveExperimentDescriptionColumns(  String name, 
+                                                    String description, 
+                                                    String instrument, 
+                                                    String strategy, 
+                                                    String source, 
+                                                    String selection, 
+                                                    String layout, 
+                                                    //String constructionProtocol, 
+                                                    String primaryIdExperiment) throws ObjectStoreException {
+
+        Item score = createItem("ExperimentConditions");
+        /** start 04-sep-2018 */
+        score.setAttribute("name", name);
         score.setAttribute("description", description);
-        if (verifyExperiment(primaryIdExperiment)) {
+        score.setAttribute("instrument", instrument);
+        score.setAttribute("strategy", strategy);
+        score.setAttribute("source", source);
+        score.setAttribute("selection", selection);
+        score.setAttribute("layout", layout);
+        //score.setAttribute("constructionProtocol", constructionProtocol);
+        /*if (verifyExperiment(primaryIdExperiment)) {
             score.setReference("experiment", experimentItems.get(primaryIdExperiment));
-        }
+        }*/
         store(score);
+        verifyConditionItems.put(name, score.getIdentifier());
+        /** fin 04-sep-2018 */
     }
 
     private void ExperimentDescriptionColumnsExecute(Iterator tsvIter, String fileName) throws Exception {
@@ -177,12 +216,19 @@ public class LabisGeneMetadataConverter extends BioFileConverter
 
         if (end > 0) {
             while (tsvIter.hasNext()) {
-                String[] line              = (String[]) tsvIter.next();
-                String primaryIdExperiment = (line.length > 0) ? line[0] : "";
-                String Name                = (line.length > 1) ? line[1] : "";
-                String description         = (line.length > 2) ? line[2] : "";
+                String[] line               = (String[]) tsvIter.next();
+                String primaryIdExperiment  = (line.length > 0) ? line[0] : "-";
+                String Name                 = (line.length > 1) ? line[1] : "-";
+                String description          = (line.length > 2) ? line[2] : "-";
+                String instrument           = (line.length > 3) ? line[3] : "-";
+                String strategy             = (line.length > 4) ? line[4] : "-";
+                String source               = (line.length > 5) ? line[5] : "-";
+                String selection            = (line.length > 6) ? line[6] : "-";
+                String layout               = (line.length > 7) ? line[7] : "-";
+                //String constructionProtocol = (line.length > 8) ? line[8] : "-";
                 if (StringUtils.isBlank(Name) == false) {
-                    saveExperimentDescriptionColumns(Name, description, primaryIdExperiment);
+                    //saveExperimentDescriptionColumns(Name, description, primaryIdExperiment);
+                    saveExperimentDescriptionColumns(Name, description, instrument, strategy, source, selection, layout, primaryIdExperiment);//constructionProtocol, 
                 }
             }
         } else {
@@ -301,6 +347,14 @@ public class LabisGeneMetadataConverter extends BioFileConverter
     private boolean verifyTypeDicionary(String name) throws ObjectStoreException {
         return typeDiccionaryItmes.containsKey(name);
     }
+
+    /** start 04-sep-2018 */
+        
+    private boolean verifyCondition(String name) throws ObjectStoreException {
+        return verifyConditionItems.containsKey(name);
+    }
+
+    /** fin 04-sep-2018 */
 
     protected void setFileHandler() throws IOException{
         LOGGER                    = Logger.getLogger("MyLog");

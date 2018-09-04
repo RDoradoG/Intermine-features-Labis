@@ -93,7 +93,7 @@ public class GeneAtlasDisplayer extends ReportDisplayer
         PathQuery query = new PathQuery(model);
         query.addView("ExpressionTypeDiccionary.name");
         query.addOrderBy("ExpressionTypeDiccionary.name", OrderDirection.ASC);
-        query.addConstraint(Constraints.eq("ExpressionTypeDiccionary.ExpressionValue.gene.primaryIdentifier", geneId));
+        query.addConstraint(Constraints.eq("ExpressionTypeDiccionary.expressionValue.gene.primaryIdentifier", geneId));
         return query;
     }
 

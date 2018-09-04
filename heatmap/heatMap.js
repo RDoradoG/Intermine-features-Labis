@@ -69,7 +69,11 @@ function ChangeExepreiment(value, addID) {
 }
 
 function getConditions(addID) {
-	var query = '<query model="genomic" view="ExpressionValues.condition" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="B" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" /></query>';
+	var query = '<query model="genomic" view="ExpressionValues.condition.name" sortOrder="ExpressionValues.condition.name ASC" constraintLogic="A and B and C" >';
+	query += '<constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" />';
+	query += '<constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="B" />';
+	query += '<constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" />';
+	query += '</query>';
 	//APIExecuteQuery(query, 'conditionsOfBag');
 	APIExecuteQuery(query, {key: 'conditionsOfBag', addID: addID});
 }
@@ -77,10 +81,10 @@ function getConditions(addID) {
 function setConditions(result, addID) {
 	arrayConditions = [];
 	if (result.length > 0) {
-		arrayConditions.push(result[0]['ExpressionValues.condition'].value);
+		arrayConditions.push(result[0]['ExpressionValues.condition.name'].value);
 		for (var i = 1; i < result.length; i++) {
-			if (result[i]['ExpressionValues.condition'].value != result[i - 1]['ExpressionValues.condition'].value) {
-				arrayConditions.push(result[i]['ExpressionValues.condition'].value);
+			if (result[i]['ExpressionValues.condition.name'].value != result[i - 1]['ExpressionValues.condition.name'].value) {
+				arrayConditions.push(result[i]['ExpressionValues.condition.name'].value);
 			}
 		}
 	}
@@ -89,14 +93,22 @@ function setConditions(result, addID) {
 }
 
 function getExpressionValues(addID) {
-	var query = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue ExpressionValues.gene.primaryIdentifier" sortOrder="ExpressionValues.condition ASC ExpressionValues.gene.primaryIdentifier ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="B" /><constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="C" /></query>';
+	var query = '<query model="genomic" view="ExpressionValues.condition.name ExpressionValues.expressionValue ExpressionValues.gene.primaryIdentifier" sortOrder="ExpressionValues.condition.name ASC ExpressionValues.gene.primaryIdentifier ASC" constraintLogic="A and B and C" >';
+	query += '<constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" />';
+	query += '<constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="B" />';
+	query += '<constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="C" />';
+	query += '</query>';
 	//APIExecuteQuery(query, 'ExpressionValues');
+	console.log(query)
 	APIExecuteQuery(query, {key: 'ExpressionValues', addID: addID});
 }
 
 function ChangeExperimentType(value, addID) {
 	typeSelected = value;
-	var query ='<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" constraintLogic="A and B" ><constraint path="ExperimentDescription.ExpressionValue.type.name" op="=" value="' + typeSelected + '" code="A" /><constraint path="ExperimentDescription.ExpressionValue.gene" op="IN" value="' + bagName + '" code="B" /></query>';
+	var query ='<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" constraintLogic="A and B" >';
+	query += '<constraint path="ExperimentDescription.expressionValue.type.name" op="=" value="' + typeSelected + '" code="A" />';
+	query += '<constraint path="ExperimentDescription.expressionValue.gene" op="IN" value="' + bagName + '" code="B" />';
+	query += '</query>';
 	//APIExecuteQuery(query, 'typeExperiment');
 	APIExecuteQuery(query, {key: 'typeExperiment', addID: addID});
 }
@@ -119,7 +131,7 @@ function getArrayData(result, addID) {
 		rowCanvas.push(sum);
 		iGenes++;
 		for (var i = 1; i < result.length; i++) {
-			if (result[i]['ExpressionValues.condition'].value != result[i - 1]['ExpressionValues.condition'].value) {
+			if (result[i]['ExpressionValues.condition.name'].value != result[i - 1]['ExpressionValues.condition.name'].value) {
 				//verify null
 				while (iGenes < Genes.length) {
 					rowCanvas.push(NaN);
@@ -249,7 +261,9 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title, addID){
 					click: function(o) {
 						if (o != undefined) {
 							var featureId    = o.y.smps;
-							var query        = '<query model="genomic" view="Gene.primaryIdentifier" sortOrder="Gene.primaryIdentifier ASC" ><constraint path="Gene.primaryIdentifier" op="=" value="' + featureId + '" code="A" /></query>';
+							var query        = '<query model="genomic" view="Gene.primaryIdentifier" sortOrder="Gene.primaryIdentifier ASC" >';
+							query += '<constraint path="Gene.primaryIdentifier" op="=" value="' + featureId + '" code="A" />';
+							query += '</query>';
 							//APIExecuteQuery(query, 'getURL');
 							APIExecuteQuery(query, {key: 'getURL', addID: addID});
 						}

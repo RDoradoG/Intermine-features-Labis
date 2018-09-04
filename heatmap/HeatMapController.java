@@ -161,14 +161,14 @@ public class HeatMapController extends TilesAction
         PathQuery query = new PathQuery(model);
         query.addView("ExpressionTypeDiccionary.name");
         query.addOrderBy("ExpressionTypeDiccionary.name", OrderDirection.ASC);
-        query.addConstraint(Constraints.in("ExpressionTypeDiccionary.ExpressionValue.gene", bag.getName()));
+        query.addConstraint(Constraints.in("ExpressionTypeDiccionary.expressionValue.gene", bag.getName()));
         return query;
     }
 
     private PathQuery queryConditions(InterMineBag bag, Model model, String type, String experiment) {
         PathQuery query = new PathQuery(model);
-        query.addView("ExpressionValues.condition");
-        query.addOrderBy("ExpressionValues.condition", OrderDirection.ASC);
+        query.addView("ExpressionValues.condition.name");
+        query.addOrderBy("ExpressionValues.condition.name", OrderDirection.ASC);
         query.addConstraint(Constraints.in("ExpressionValues.gene", bag.getName()), "A");
         query.addConstraint(Constraints.eq("ExpressionValues.experiment.name", experiment), "B");
         query.addConstraint(Constraints.eq("ExpressionValues.type.name", type), "C");
@@ -178,9 +178,9 @@ public class HeatMapController extends TilesAction
 
     private  PathQuery getListPOfTypeExperiment(InterMineBag bag, Model model) {
         PathQuery query = new PathQuery(model);
-        query.addViews("ExpressionTypeDiccionary.name", "ExpressionTypeDiccionary.ExpressionValue.experiment.name");
+        query.addViews("ExpressionTypeDiccionary.name", "ExpressionTypeDiccionary.expressionValue.experiment.name");
         query.addOrderBy("ExpressionTypeDiccionary.name", OrderDirection.ASC);
-        query.addConstraint(Constraints.in("ExpressionTypeDiccionary.ExpressionValue.gene", bag.getName()));
+        query.addConstraint(Constraints.in("ExpressionTypeDiccionary.expressionValue.gene", bag.getName()));
         return query;
     }
 

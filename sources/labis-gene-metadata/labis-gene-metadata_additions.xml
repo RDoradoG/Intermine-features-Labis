@@ -2,30 +2,69 @@
 <!-- This file details any extensions needed to the data model to store data from this source, everything else is automatically generated from the model description so this is all we need to do to add to the model. -->
 
 <classes>
-  	<class name="ExperimentDescription" is-interface="true">
-  		<attribute name="name" type="java.lang.String" />
-  		<attribute name="description" type="java.lang.String" />
-  		<reference name="publication" referenced-type="Publication" />
-  		<collection name="ExpressionValue"  referenced-type="ExpressionValues" reverse-reference="experiment"/>
-  		<collection name="columns"  referenced-type="ExperimentDescriptionColumns" reverse-reference="experiment"/>
-  	</class>
+  <class name="ExperimentDescription" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="description" type="java.lang.String" />
+    <reference name="publication" referenced-type="Publication" reverse-reference="experimentDescription"/>
+    <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="experiment"/>
+    <!--collection name="conditions"  referenced-type="ExperimentConditions" reverse-reference="experiment"/-->
+    <!--collection name="columns"  referenced-type="ExperimentDescriptionColumns" reverse-reference="experiment"/-->
+  </class>
 
-	<class name="ExpressionTypeDiccionary" is-interface="true">
-  		<attribute name="name" type="java.lang.String" />
-  		<collection name="ExpressionValue"  referenced-type="ExpressionValues" reverse-reference="type"/>
-  	</class>  	
+  <class name="ExpressionTypeDiccionary" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="type"/>
+  </class>    
 
- 	<class name="ExpressionValues" is-interface="true">
-  		<attribute name="condition" type="java.lang.String" />
-  		<attribute name="expressionValue" type="java.lang.Float" />
-  		<reference name="gene" referenced-type="Gene" />
-  		<reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="ExpressionValue" />
-  		<reference name="type" referenced-type="ExpressionTypeDiccionary" reverse-reference="ExpressionValue" />
-  	</class>
+  <class name="ExpressionValues" is-interface="true">
+    <!--attribute name="condition" type="java.lang.String" /-->
+    <attribute name="expressionValue" type="java.lang.Float" />
 
-  	<class name="ExperimentDescriptionColumns" is-interface="true">
-  		<attribute name="columnName" type="java.lang.String" />
-  		<attribute name="description" type="java.lang.String" />
-  		<reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="columns" />
-  	</class>
+    <reference name="condition" referenced-type="ExperimentConditions" reverse-reference="expressionValue" />
+
+    <reference name="gene" referenced-type="Gene" reverse-reference="expressionValue" />
+    <reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="expressionValue" />
+    <reference name="type" referenced-type="ExpressionTypeDiccionary" reverse-reference="expressionValue" />
+  </class>
+
+  <class name="ExperimentConditions" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="description" type="java.lang.String" />
+    <attribute name="instrument" type="java.lang.String" />
+    <attribute name="strategy" type="java.lang.String" />
+    <attribute name="source" type="java.lang.String" />
+    <attribute name="selection" type="java.lang.String" />
+    <attribute name="layout" type="java.lang.String" />
+
+    <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="condition"/>
+
+    <!--reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="conditions" /-->
+  </class>
+
+  <class name="GeneFamilies" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="description" type="java.lang.String" />
+    <reference name="db_link" referenced-type="Db_link" reverse-reference="geneFamilie"/>
+    <collection name="geneFamilies_gene" referenced-type="GeneFamilies_gene" reverse-reference="geneFamilie"/>
+  </class>
+
+  <class name="GeneFamilies_gene" is-interface="true">
+    <reference name="gene" referenced-type="Gene" reverse-reference="geneFamilie"/>
+    <reference name="geneFamilie" referenced-type="GeneFamilies" reverse-reference="geneFamilies_gene"/>
+  </class>
+
+  <class name="Db_link" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="link" type="java.lang.String" />
+    <collection name="geneFamilie" referenced-type="GeneFamilies" reverse-reference="db_link"/>
+  </class>
+
+  <class name="Gene" is-interface="true">
+    <collection name="expressionValue" referenced-type="ExpressionValues" reverse-reference="gene"/>
+    <collection name="geneFamilie" referenced-type="GeneFamilies_gene" reverse-reference="gene"/>
+  </class>
+
+  <class name="Publication" is-interface="true">
+    <collection name="experimentDescription" referenced-type="ExperimentDescription" reverse-reference="publication"/>
+  </class>
 </classes>

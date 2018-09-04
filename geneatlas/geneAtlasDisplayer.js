@@ -66,7 +66,10 @@ class geneAtlas{
 	 */
 	ChangeExperimentType(value) {
 		typeSelected = value;
-		var query    = '<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" ><constraint path="ExperimentDescription.ExpressionValue.type.name" op="=" value="' + typeSelected + '" code="A" /><constraint path="ExperimentDescription.ExpressionValue.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" /></query>';
+		var query    = '<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" >';
+		query += '<constraint path="ExperimentDescription.expressionValue.type.name" op="=" value="' + typeSelected + '" code="A" />';
+		query += '<constraint path="ExperimentDescription.expressionValue.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
+		query += '</query>';
 		this.APIExecuteQuery(query, 'typeExperiment');
 	}
 
@@ -78,7 +81,11 @@ class geneAtlas{
 	 */
 	ChangeExepreiment(value) {
 		experiment = value;
-		var query  = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C" ><constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" /><constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" /><constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" /></query>';
+		var query  = '<query model="genomic" view="ExpressionValues.condition.name ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition.name ASC" constraintLogic="A and B and C" >';
+		query += '<constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" />';
+		query += '<constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
+		query += '<constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" />';
+		query += '</query>';
 		this.APIExecuteQuery(query, 'Experiment');
 	}
 
@@ -94,7 +101,7 @@ class geneAtlas{
 		var option = jQuery("<option></option>").attr("value", "").text("-- SELECT --");
 		jQuery('#li' + this.addID).append(option);
 		for(var i = 0; i < result.length; i++) {
-			var value  = result[i]['ExpressionValues.condition'].value;
+			var value  = result[i]['ExpressionValues.condition.name'].value;
 			var option = jQuery("<option></option>").attr("value", value).text(value);
 			jQuery('#li' + this.addID).append(option);
 		}
@@ -174,7 +181,7 @@ function drawGeneAtlasChart(expressionValues, useLinearScale, orderBy){
 	enrichment_data.addColumn('number', 'Expression Value', 'expressionValue');
 
 	for (var i = 0; i < auxExpressionValues.length; i++) {
-		var enrichment_row = [auxExpressionValues[i]['ExpressionValues.condition'].value, auxExpressionValues[i]['ExpressionValues.expressionValue'].value];
+		var enrichment_row = [auxExpressionValues[i]['ExpressionValues.condition.name'].value, auxExpressionValues[i]['ExpressionValues.expressionValue'].value];
 		enrichment_data.addRow(enrichment_row);
 	}
 
@@ -230,17 +237,17 @@ function setValuesComparation(firstExperiment, secondExperiment, addId) {
 function setComparation(seta, setb, typeSelectedA, typeSelectedB, experimentA, experimentB) {
 	var strConditionsA = getConditionsStr(seta);
 	var strConditionsB = getConditionsStr(setb);
-	var queryA         = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C and D" >';
+	var queryA         = '<query model="genomic" view="ExpressionValues.condition.name ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition.name ASC" constraintLogic="A and B and C and D" >';
 	queryA             += '<constraint path="ExpressionValues.experiment.name" op="=" value="' + experimentA + '" code="A" />';
 	queryA             += '<constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
 	queryA             += '<constraint path="ExpressionValues.type.name" op="=" value="' + typeSelectedA + '" code="C" />';
-	queryA             += '<constraint path="ExpressionValues.condition" op="ONE OF" code="D">' + strConditionsA + '</constraint>';
+	queryA             += '<constraint path="ExpressionValues.condition.name" op="ONE OF" code="D">' + strConditionsA + '</constraint>';
 	queryA             += '</query>';
-	var queryB         = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C and D" >';
+	var queryB         = '<query model="genomic" view="ExpressionValues.condition.name ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition.name ASC" constraintLogic="A and B and C and D" >';
 	queryB             += '<constraint path="ExpressionValues.experiment.name" op="=" value="' + experimentB + '" code="A" />';
 	queryB             += '<constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
 	queryB             += '<constraint path="ExpressionValues.type.name" op="=" value="' + typeSelectedB + '" code="C" />';
-	queryB             += '<constraint path="ExpressionValues.condition" op="ONE OF" code="D">' + strConditionsB + '</constraint>';
+	queryB             += '<constraint path="ExpressionValues.condition.name" op="ONE OF" code="D">' + strConditionsB + '</constraint>';
 	queryB             += '</query>';
 	this.APIExecuteQuery(queryA, {id: 'Experiment_comparationA', data: queryB});
 }
@@ -422,8 +429,8 @@ function fillAOption(id, value, selected) {
 function ChangeExperimentType(value) {
 	typeSelected = value;
 	var query    = '<query model="genomic" view="ExperimentDescription.description ExperimentDescription.name" sortOrder="ExperimentDescription.description ASC" >';
-	query        += '<constraint path="ExperimentDescription.ExpressionValue.type.name" op="=" value="' + typeSelected + '" code="A" />';
-	query        += '<constraint path="ExperimentDescription.ExpressionValue.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
+	query        += '<constraint path="ExperimentDescription.expressionValue.type.name" op="=" value="' + typeSelected + '" code="A" />';
+	query        += '<constraint path="ExperimentDescription.expressionValue.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
 	query        += '</query>';
 	APIExecuteQuery(query, {id: 'typeExperiment'});
 }
@@ -436,7 +443,7 @@ function ChangeExperimentType(value) {
  */
 function ChangeExepreiment(value) {
 	experiment = value;
-	var query  = '<query model="genomic" view="ExpressionValues.condition ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition ASC" constraintLogic="A and B and C" >';
+	var query  = '<query model="genomic" view="ExpressionValues.condition.name ExpressionValues.expressionValue" sortOrder="ExpressionValues.condition.name ASC" constraintLogic="A and B and C" >';
 	query      += '<constraint path="ExpressionValues.experiment.name" op="=" value="' + experiment + '" code="A" />';
 	query      += '<constraint path="ExpressionValues.gene.primaryIdentifier" op="=" value="' + PrimaryIdentifier + '" code="B" />';
 	query      += '<constraint path="ExpressionValues.type.name" op="=" value="' + typeSelected + '" code="C" />';
@@ -654,8 +661,8 @@ function setScatterPlot(seta, setb) {
 	var allDataScatter = [];
 	for (var i = 0; i < seta.length; i++) {
 		allDataScatter.push([seta[i]['ExpressionValues.expressionValue'].value, setb[i]['ExpressionValues.expressionValue'].value]);
-		allConditions.push([seta[i]['ExpressionValues.condition'].value, setb[i]['ExpressionValues.condition'].value]);
-		var label = seta[i]['ExpressionValues.condition'].value + ' - ' + setb[i]['ExpressionValues.condition'].value;
+		allConditions.push([seta[i]['ExpressionValues.condition.name'].value, setb[i]['ExpressionValues.condition.name'].value]);
+		var label = seta[i]['ExpressionValues.condition.name'].value + ' - ' + setb[i]['ExpressionValues.condition.name'].value;
 		fillAOption('pairConditios', label, false);
 	}
 
