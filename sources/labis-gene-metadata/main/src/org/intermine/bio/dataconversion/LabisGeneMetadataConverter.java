@@ -18,9 +18,12 @@ import java.util.logging.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.BuildException;
@@ -36,26 +39,24 @@ import org.intermine.xml.full.Item;
  */
 public class LabisGeneMetadataConverter extends BioFileConverter
 {
-    //
-    private static final String DATASET_TITLE       = "Add DataSet.title here";
-    private static final String DATA_SOURCE_NAME    = "Add DataSource.name here";
-    private static final String LOGFILE             = "/home/rdorado/logs/MyJavaLog.log";
-    
-    private static Logger LOGGER                    = null;
-    
-    private Map<String, String> geneItems           = new HashMap<String, String>();
-    private Map<String, String> experimentItems     = new HashMap<String, String>();
-    private Map<String, String> typeDiccionaryItmes = new HashMap<String, String>();
+    private static final String DATASET_TITLE                         = "LabisGeneMetadata";
+    private static final String DATA_SOURCE_NAME                      = "labis-gene-metadata";
+    private static final String LOGFILE                               = "/home/rdorado/logs/MyJavaLog.log";
 
-    /** start 04-sep-2018 */
-        
-    private Map<String, String> verifyConditionItems = new HashMap<String, String>();
+    private ErrorLog loggable;
 
-    /** fin 04-sep-2018 */
+    private static Logger LOGGER                                      = null;
 
-    private String publication_id = "2055463";
-    private String publication_identifier = "";
+    private Map<String, Gene> geneItems                               = new HashMap<String, Gene>();
+    private Map<String, ExperimentDescription> experimentItems        = new HashMap<String, ExperimentDescription>();
+    private Map<String, ExpressionTypeDiccionary> typeDiccionaryItmes = new HashMap<String, ExpressionTypeDiccionary>();
 
+    private Map<String, ExperimentConditions> verifyConditionItems    = new HashMap<String, ExperimentConditions>();
+    private Map<String, Publication> pubItems                         = new HashMap<String, Publication>();
+    private Map<String, String> familiesItems                         = new HashMap<String, String>();
+    private Map<String, GeneFamilies> newFamiliesItems                = new HashMap<String, GeneFamilies>();
+    private Map<String, String> familiesGeneItems                     = new HashMap<String, String>();
+    private Map<String, TypeGeneFamily> geneFamiliesType              = new HashMap<String, TypeGeneFamily>();
 
     /**
      * Constructor
@@ -64,7 +65,7 @@ public class LabisGeneMetadataConverter extends BioFileConverter
      */
     public LabisGeneMetadataConverter(ItemWriter writer, Model model) throws IOException {
         super(writer, model, DATA_SOURCE_NAME, DATASET_TITLE);
-        setFileHandler();
+        loggable = new ErrorLog(LOGFILE);
     }
 
     /**
@@ -73,12 +74,12 @@ public class LabisGeneMetadataConverter extends BioFileConverter
      * {@inheritDoc}
      */
     public void process(Reader reader) throws Exception {
+        File currentFile = getCurrentFile();
+        String fileName  = currentFile.getName();
 
+        loggable.setActualFile(fileName);
 
-        File currentFile   = getCurrentFile();
-        String fileName    = currentFile.getName();
-
-        makeLog("Start (" + fileName + ")");
+        loggable.makeLog("Start (" + fileName + ")");
 
         Iterator<?> tsvIter;
         try {
@@ -91,24 +92,29 @@ public class LabisGeneMetadataConverter extends BioFileConverter
 
         switch(opt) {
             case 1:
-                createPublication();
-                ExperimentDescriptionExecute(tsvIter, fileName);
+                ExperimentDescriptionExecute(tsvIter);
             break;
             case 2:
-                ExpressionTypeDiccionaryExecute(tsvIter, fileName);
+                ExpressionTypeDiccionaryExecute(tsvIter);
             break;
             case 3:
-                ExpressionValuesExecute(tsvIter, fileName);
+                ExperimentDescriptionColumnsExecute(tsvIter);
             break;
             case 4:
-                ExperimentDescriptionColumnsExecute(tsvIter, fileName);
+                ExpressionValuesExecute(tsvIter);
+            break;
+            case 5:
+                geneFamiliesTypeExecute(tsvIter);
+            break;
+            case 6:
+                geneFamilyExcute(tsvIter);
             break;
             default:
-                makeErrorLog(fileName, "Table Option incorrect.");
+                loggable.makeErrorLog("Name of the file invalid.");
             break;
         }
 
-        makeLog("End (" + fileName + ")");
+        loggable.makeLog("End (" + fileName + ")");
     }
 
     private int getOptionFileName(String fileName) {
@@ -118,95 +124,162 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         if (fileName.indexOf("B-ExpressionTypeDiccionary-") == 0) {
             return 2;
         }
-        /*if (fileName.indexOf("C-ExpressionValues-") == 0) {
-            return 3;
-        }
-        if (fileName.indexOf("D-ExperimentDescriptionColumns-") == 0) {
-            return 4;
-        }*/
-        /** start 04-sep-2018 */
         if (fileName.indexOf("C-ExperimentDescriptionColumns-") == 0) {
-            return 4;
+            return 3;
         }
         if (fileName.indexOf("D-ExpressionValues-") == 0) {
-            return 3;
+            return 4;
         }
-        /** fin 04-sep-2018 */
+        if (fileName.indexOf("gene_families_type") == 0) {
+            return 5;
+        }
+        if (fileName.indexOf("gene_family") == 0) {
+            return 6;
+        }
         return 0;
     }
 
-    private void saveExpressionValues(String expressionValue, String condition, String primaryIdGenes, String primaryIdExperiment, String typeDiccionary) throws Exception {
-        Item score = createItem("ExpressionValues");
-        score.setAttribute("expressionValue", expressionValue);
-        score.setReference("gene", geneItems.get(primaryIdGenes));
-
-        /** start 04-sep-2018 */
-        if (verifyCondition(condition)) {
-            score.setReference("condition", verifyConditionItems.get(condition));
+    public void saveGeneFamiliesType(String type, String dbLink) throws ObjectStoreException, Exception {
+        if (!geneFamiliesType.containsKey(type)) {
+            TypeGeneFamily typeGeneFamily = new TypeGeneFamily();
+            typeGeneFamily.setName(type);
+            typeGeneFamily.setDbLink(dbLink);
+            Item score = createItem(typeGeneFamily.getClassName());
+            score      = typeGeneFamily.save(score);
+            store(score);
+            typeGeneFamily.setUniqueId(score.getIdentifier());
+            geneFamiliesType.put(type, typeGeneFamily);
         }
-        //score.setAttribute("condition", condition);
-        /** fin 04-sep-2018 */
+    }
 
+    public void saveFamilyGene(String family, String gene, String description) throws ObjectStoreException, Exception {
+        GeneFamiliesGenes geneFamiliesGenes = new GeneFamiliesGenes();
+        geneFamiliesGenes.setDescription(description);
+        geneFamiliesGenes.setGeneFamily(newFamiliesItems.get(family));
+        geneFamiliesGenes.setGene(geneItems.get(gene));
+        Item score = createItem(geneFamiliesGenes.getClassName());
+        score      = geneFamiliesGenes.save(score);
+        store(score);
+        geneFamiliesGenes.setUniqueId(score.getIdentifier());
+    }
+
+    private void saveFamily(String family, String type) throws ObjectStoreException, Exception {
+        if (!newFamiliesItems.containsKey(family)) {
+            GeneFamilies geneFamilies     = new GeneFamilies();
+            TypeGeneFamily typeGeneFamily = geneFamiliesType.get(type);
+            geneFamilies.setName(family);
+            geneFamilies.setType(geneFamiliesType.get(type));
+            Item score = createItem(geneFamilies.getClassName());
+            score      = geneFamilies.save(score);
+            store(score);
+            geneFamilies.setUniqueId(score.getIdentifier());
+            newFamiliesItems.put(family, geneFamilies);
+        }
+    }
+
+    private void saveExpressionValues(String expressionValue, String condition, String primaryIdGenes, String primaryIdExperiment, String typeDiccionary) throws ObjectStoreException, Exception {
+        ExpressionValues expressionValues = new ExpressionValues();
+        expressionValues.setExpressionValue(expressionValue);
+        expressionValues.setGene(geneItems.get(primaryIdGenes));
+        if (verifyCondition(condition)) {
+            expressionValues.setExperimentConditions(verifyConditionItems.get(condition));
+        }
         if (verifyExperiment(primaryIdExperiment)) {
-            score.setReference("experiment", experimentItems.get(primaryIdExperiment));
+            expressionValues.setExperimentDescription(experimentItems.get(primaryIdExperiment));
         }
         if (verifyTypeDicionary(typeDiccionary)) {
-            score.setReference("type", typeDiccionaryItmes.get(typeDiccionary));
+            expressionValues.setExpressionTypeDiccionary(typeDiccionaryItmes.get(typeDiccionary));
         }
+        Item score = createItem(expressionValues.getClassName());
+        score      = expressionValues.save(score);
         store(score);
+        expressionValues.setUniqueId(score.getIdentifier());
     }
 
-    private void saveExperimentDescription(String name, String Decription) throws ObjectStoreException {
-        Item score = createItem("ExperimentDescription");
-        score.setAttribute("name", name);
-        score.setAttribute("description", Decription);
-        score.setReference("publication", publication_identifier);
+    private void saveExperimentDescription(String name, String Decription, Publication PubId) throws ObjectStoreException, Exception {
+        ExperimentDescription experimentDescription = new ExperimentDescription();
+        experimentDescription.setName(name);
+        experimentDescription.setDescription(Decription);
+        experimentDescription.setPublication(PubId);
+        Item score = createItem(experimentDescription.getClassName());
+        score      = experimentDescription.save(score);
         store(score);
-        experimentItems.put(name, score.getIdentifier());
+        experimentDescription.setUniqueId(score.getIdentifier());
+        experimentItems.put(name, experimentDescription);
     }
 
-    private void saveExpressionType(String name) throws ObjectStoreException {
-        Item score = createItem("ExpressionTypeDiccionary");
-        score.setAttribute("name", name);
+    private void saveExpressionType(String name) throws ObjectStoreException, Exception {
+        ExpressionTypeDiccionary expressionTypeDiccionary = new ExpressionTypeDiccionary();
+        expressionTypeDiccionary.setName(name);
+        Item score = createItem(expressionTypeDiccionary.getClassName());
+        score      = expressionTypeDiccionary.save(score);
         store(score);
-        typeDiccionaryItmes.put(name, score.getIdentifier());
+        expressionTypeDiccionary.setUniqueId(score.getIdentifier());
+        typeDiccionaryItmes.put(name, expressionTypeDiccionary);
     }
 
-    private void saveExperimentDescriptionColumns(  String name, 
-                                                    String description, 
-                                                    String instrument, 
-                                                    String strategy, 
-                                                    String source, 
-                                                    String selection, 
-                                                    String layout, 
-                                                    //String constructionProtocol, 
-                                                    String primaryIdExperiment) throws ObjectStoreException {
-
-        Item score = createItem("ExperimentConditions");
-        /** start 04-sep-2018 */
-        score.setAttribute("name", name);
-        score.setAttribute("description", description);
-        score.setAttribute("instrument", instrument);
-        score.setAttribute("strategy", strategy);
-        score.setAttribute("source", source);
-        score.setAttribute("selection", selection);
-        score.setAttribute("layout", layout);
-        //score.setAttribute("constructionProtocol", constructionProtocol);
-        /*if (verifyExperiment(primaryIdExperiment)) {
-            score.setReference("experiment", experimentItems.get(primaryIdExperiment));
-        }*/
+    private void saveExperimentDescriptionColumns(  String name, String description,
+                                                    String instrument, String strategy,
+                                                    String source, String selection,
+                                                    String layout, String primaryIdExperiment) throws ObjectStoreException, Exception {
+        ExperimentConditions experimentConditions = new ExperimentConditions();
+        experimentConditions.setName(name);
+        experimentConditions.setDescription(description);
+        experimentConditions.setInstrument(instrument);
+        experimentConditions.setStrategy(strategy);
+        experimentConditions.setSource(source);
+        experimentConditions.setSelection(selection);
+        experimentConditions.setLayout(layout);
+        Item score = createItem(experimentConditions.getClassName());
+        score      = experimentConditions.save(score);
         store(score);
-        verifyConditionItems.put(name, score.getIdentifier());
-        /** fin 04-sep-2018 */
+        experimentConditions.setUniqueId(score.getIdentifier());
+        verifyConditionItems.put(name, experimentConditions);
     }
 
-    private void ExperimentDescriptionColumnsExecute(Iterator tsvIter, String fileName) throws Exception {
-        int end         = 0;
+    private void geneFamilyExcute(Iterator tsvIter) throws ObjectStoreException, Exception {
+        while (tsvIter.hasNext()) {
+            String[] line      = (String[]) tsvIter.next();
+            String gene        = (line.length > 0) ? line[0] : "-";
+            String type        = (line.length > 1) ? line[1] : "-";
+            String family      = (line.length > 2) ? line[2] : "-";
+            String description = (line.length > 3) ? line[3] : "-";
+            String[] families  = family.split(",");
+            if (verifyBioEntity(gene)) {
+                for( int i = 0; i < families.length; i++) {
+                    saveFamily(families[i], type);
+                    //createBioEntity(gene);
+                    saveFamilyGene(families[i], gene, description);
+                }
+            }
+        }
+    }
 
+    private void geneFamiliesTypeExecute(Iterator tsvIter) throws Exception {
+       if (tsvIter.hasNext()) {
+            String[] line = (String[]) tsvIter.next();
+            if (line.length < 1) {
+                loggable.makeErrorLog("No data.");
+            }
+        }
+
+        while (tsvIter.hasNext()) {
+            String[] line = (String[]) tsvIter.next();
+            String type   = (line.length > 0) ? line[0] : "";
+            String dbLink = (line.length > 1) ? line[1] : "";
+            if (StringUtils.isBlank(type) == false) {
+                saveGeneFamiliesType(type, dbLink);
+            }
+        }
+    }
+
+
+    private void ExperimentDescriptionColumnsExecute(Iterator tsvIter) throws Exception {
+        int end = 0;
         if (tsvIter.hasNext()) {
             String[] line = (String[]) tsvIter.next();
             if (line.length < 1) {
-                makeErrorLog(fileName, "No data.");
+                loggable.makeErrorLog("No data.");
             } else {
                 if (!StringUtils.isBlank(line[0])) {
                     end++;
@@ -225,24 +298,22 @@ public class LabisGeneMetadataConverter extends BioFileConverter
                 String source               = (line.length > 5) ? line[5] : "-";
                 String selection            = (line.length > 6) ? line[6] : "-";
                 String layout               = (line.length > 7) ? line[7] : "-";
-                //String constructionProtocol = (line.length > 8) ? line[8] : "-";
                 if (StringUtils.isBlank(Name) == false) {
-                    //saveExperimentDescriptionColumns(Name, description, primaryIdExperiment);
-                    saveExperimentDescriptionColumns(Name, description, instrument, strategy, source, selection, layout, primaryIdExperiment);//constructionProtocol, 
+                    saveExperimentDescriptionColumns(Name, description, instrument, strategy, source, selection, layout, primaryIdExperiment);
                 }
             }
         } else {
-            makeErrorLog(fileName, "File Empty of data.");
+            loggable.makeErrorLog("File Empty of data.");
         }
     }
 
-    private void ExpressionTypeDiccionaryExecute(Iterator tsvIter, String fileName) throws Exception {
+    private void ExpressionTypeDiccionaryExecute(Iterator tsvIter) throws Exception {
        int end = 0;
 
         if (tsvIter.hasNext()) {
             String[] line = (String[]) tsvIter.next();
             if (line.length < 1) {
-                makeErrorLog(fileName, "No data.");
+                loggable.makeErrorLog("No data.");
             } else {
                 if (!StringUtils.isBlank(line[0])) {
                     end++;
@@ -252,24 +323,24 @@ public class LabisGeneMetadataConverter extends BioFileConverter
 
         if (end > 0) {
             while (tsvIter.hasNext()) {
-                String[] line      = (String[]) tsvIter.next();
-                String name        = (line.length > 0) ? line[0] : "";
+                String[] line = (String[]) tsvIter.next();
+                String name   = (line.length > 0) ? line[0] : "";
                 if (StringUtils.isBlank(name) == false) {
                     saveExpressionType(name);
                 }
             }
         } else {
-            makeErrorLog(fileName, "File Empty of data.");
+            loggable.makeErrorLog("File Empty of data.");
         }
     }
 
-    private void ExperimentDescriptionExecute(Iterator tsvIter, String fileName) throws Exception {
+    private void ExperimentDescriptionExecute(Iterator tsvIter) throws Exception {
         int end = 0;
 
         if (tsvIter.hasNext()) {
             String[] line = (String[]) tsvIter.next();
             if (line.length < 1) {
-                makeErrorLog(fileName, "No data.");
+                loggable.makeErrorLog("No data.");
             } else {
                 if (!StringUtils.isBlank(line[0])) {
                     end++;
@@ -279,26 +350,28 @@ public class LabisGeneMetadataConverter extends BioFileConverter
 
         if (end > 0) {
             while (tsvIter.hasNext()) {
-                String[] line      = (String[]) tsvIter.next();
-                String name        = (line.length > 0) ? line[0] : "";
-                String Description = (line.length > 1) ? line[1] : "";
+                String[] line        = (String[]) tsvIter.next();
+                String name          = (line.length > 0) ? line[0] : "-";
+                String Description   = (line.length > 1) ? line[1] : "-";
+                String PubId         = (line.length > 2) ? line[2] : "-";
+                Publication pubMedId = createPublication(PubId);
                 if (StringUtils.isBlank(name) == false) {
-                    saveExperimentDescription(name, Description);
+                    saveExperimentDescription(name, Description, pubMedId);
                 }
             }
         } else {
-            makeErrorLog(fileName, "File Empty of data.");
+            loggable.makeErrorLog("File Empty of data.");
         }
     }
 
-    private void ExpressionValuesExecute(Iterator tsvIter, String fileName) throws Exception {
+    private void ExpressionValuesExecute(Iterator tsvIter) throws Exception {
         String [] heads = null;
         int end         = 0;
 
         if (tsvIter.hasNext()) {
             String[] line = (String[]) tsvIter.next();
             if (line.length < 1) {
-                makeErrorLog(fileName, "No data.");
+                loggable.makeErrorLog("No data.");
             } else {
                 for (int i = 0; i < line.length; i++) {
                     if (StringUtils.isBlank(line[i])) {
@@ -307,20 +380,19 @@ public class LabisGeneMetadataConverter extends BioFileConverter
                     end++;
                 }
                 heads = new String[end];
-                System.arraycopy(line, 0, heads, 0, end);;
+                System.arraycopy(line, 0, heads, 0, end);
             }
         } else {
-           makeErrorLog(fileName, "File Empty of data.");
+           loggable.makeErrorLog("File Empty of data.");
         }
 
         while (tsvIter.hasNext()) {
             String[] line              = (String[]) tsvIter.next();
-            int sizeLine = line.length;
+            int sizeLine               = line.length;
             String primaryIdGenes      = line[0];
             String primaryIdExperiment = line[1];
             String typeDiccionary      = line[2];
             createBioEntity(primaryIdGenes);
-            //createExpEntity(primaryIdExperiment);
             for (int i = 3; i < end; i++) {
                 if (i >= sizeLine) {
                     break;
@@ -330,55 +402,51 @@ public class LabisGeneMetadataConverter extends BioFileConverter
         }
     }
 
-    private void createBioEntity(String primaryId) throws ObjectStoreException {
-        Item bioentity = null;
+    private void createBioEntity(String primaryId) throws ObjectStoreException, Exception {
         if (!geneItems.containsKey(primaryId)) {
-            bioentity = createItem("Gene");
-            bioentity.setAttribute("primaryIdentifier", primaryId);
-            store(bioentity);
-            geneItems.put(primaryId, bioentity.getIdentifier());
+            Gene gene = new Gene();
+            gene.setPrimaryIdentifier(primaryId);
+            Item score = createItem(gene.getClassName());
+            score      = gene.save(score);
+            store(score);
+            gene.setUniqueId(score.getIdentifier());
+            geneItems.put(primaryId, gene);
         }
     }
 
-    private boolean verifyExperiment(String name) throws ObjectStoreException {
+    private Publication createPublication(String PubId) throws ObjectStoreException, Exception {
+        Publication publication = null;
+        if (!pubItems.containsKey(PubId)) {
+            publication = new Publication();
+            publication.setPubMedId(PubId);
+            Item score = createItem(publication.getClassName());
+            score      = publication.save(score);
+            store(score);
+            publication.setUniqueId(score.getIdentifier());
+            pubItems.put(PubId, publication);
+        } else {
+            publication = pubItems.get(PubId);;
+        }
+        return publication;
+    }
+
+    private boolean verifyExperiment(String name) throws ObjectStoreException, Exception {
         return experimentItems.containsKey(name);
     }
 
-    private boolean verifyTypeDicionary(String name) throws ObjectStoreException {
+    private boolean verifyTypeDicionary(String name) throws ObjectStoreException, Exception {
         return typeDiccionaryItmes.containsKey(name);
     }
 
-    /** start 04-sep-2018 */
-        
-    private boolean verifyCondition(String name) throws ObjectStoreException {
+    private boolean verifyCondition(String name) throws ObjectStoreException, Exception {
         return verifyConditionItems.containsKey(name);
     }
 
-    /** fin 04-sep-2018 */
-
-    protected void setFileHandler() throws IOException{
-        LOGGER                    = Logger.getLogger("MyLog");
-        FileHandler filehandler;
-        filehandler               = new FileHandler(LOGFILE);
-        LOGGER.addHandler(filehandler);
-        LOGGER.setUseParentHandlers(false);
-        SimpleFormatter formatter = new SimpleFormatter();
-        filehandler.setFormatter(formatter);
-    }
-
-    private void makeErrorLog(String FileName, String Error) throws Exception {
-        makeLog("ERROR - file(" + FileName + "): " + Error);
-    }
-
-    public void makeLog(String logger) throws Exception{
-        LOGGER.info(logger);
-    }
-
-    private void createPublication() throws ObjectStoreException {
-        Item pub               = null;
-        pub                    = createItem("Publication");
-        pub.setAttribute("pubMedId", publication_id);
-        store(pub);
-        publication_identifier = pub.getIdentifier();
+    private Boolean verifyBioEntity(String primaryId) throws Exception {
+        if (!geneItems.containsKey(primaryId)) {
+            loggable.makeErrorLog("Gene " + primaryId + " does not exists.");
+            return false;
+        }
+        return true;
     }
 }

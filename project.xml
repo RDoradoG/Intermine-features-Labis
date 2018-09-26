@@ -1,0 +1,118 @@
+<project type="bio">
+  <property name="target.model" value="genomic"/>
+  <property name="source.location" location="../bio/sources/"/>
+  <property name="common.os.prefix" value="common"/>
+  <property name="intermine.properties.file" value="phycomine.properties"/>
+  <property name="default.intermine.properties.file" location="../default.intermine.integrate.properties"/>
+
+  <sources>
+    <source name="labis-gene-metadata" type="labis-gene-metadata">
+        <property name="src.data.dir" location="/home/rdorado/Creinhardtii/labisGeneMetadata/"/>
+    </source>
+
+    <source name="uniprot-creinhardtii" type="uniprot">
+      <property name="uniprot.organisms" value="3055"/>
+      <property name="creatego" value="true"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/uniprot/"/>
+    </source>
+    <source name="creinhardtiiNucleous-gff" type="malaria-gff">
+      <!-- malaria-gff seems to be a class, located at  /home/rdorado/intermine/bio/sources/example-sources/malaria-gff/
+      You SHOULD create your own class "creinhardtii-gff", to avoid confussions (?)
+      -->
+      <property name="gff3.taxonId" value="3055"/>
+      <property name="gff3.seqDataSourceName" value="phytozomev10"/>
+      <property name="gff3.dataSourceName" value="phytozomev10"/>
+      <property name="gff3.seqClsName" value="Chromosome"/>
+      <property name="gff3.dataSetTitle" value="Phytozome v12.1 Chlamydomonas reinhardtii"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/genome/gff/Nucleous"/>
+    </source>
+    <source name="creinhardtiiMitochondrion-gff" type="malaria-gff">
+      <!-- malaria-gff seems to be a class, located at  /home/rdorado/intermine/bio/sources/example-sources/malaria-gff/
+      You SHOULD create your own class "creinhardtii-gff", to avoid confussions (?)
+      -->
+      <property name="gff3.taxonId" value="3055"/>
+      <property name="gff3.seqDataSourceName" value="GenBank"/>
+      <property name="gff3.dataSourceName" value="GenBank"/>
+      <property name="gff3.seqClsName" value="Chromosome"/>
+      <property name="gff3.dataSetTitle" value="GenBank Chlamydomonas reinhardtii Mitochondrion"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/genome/gff/Mitochondrion"/>
+    </source>
+    <source name="creinhardtiiChloroplast-gff" type="malaria-gff">
+      <!-- malaria-gff seems to be a class, located at  /home/rdorado/intermine/bio/sources/example-sources/malaria-gff/
+      You SHOULD create your own class "creinhardtii-gff", to avoid confussions (?)
+      -->
+      <property name="gff3.taxonId" value="3055"/>
+      <property name="gff3.seqDataSourceName" value="GenBank"/>
+      <property name="gff3.dataSourceName" value="GenBank"/>
+      <property name="gff3.seqClsName" value="Chromosome"/>
+      <property name="gff3.dataSetTitle" value="GenBank Chlamydomonas reinhardtii Chloroplast"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/genome/gff/Chloroplast"/>
+    </source>
+    <source name="creinhardtiiNucleous-chromosome-fasta" type="fasta" dump="true">
+      <property name="fasta.className" value="org.intermine.model.bio.Chromosome"/>
+      <property name="fasta.dataSourceName" value="phytozomev10"/>
+      <property name="fasta.dataSetTitle" value="Phytozome v12.1 Chlamydomonas reinhardtii"/>
+      <property name="fasta.taxonId" value="3055"/>
+      <property name="fasta.sequenceType" value="protein"/>
+      <property name="fasta.includes" value="*.fasta"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/genome/fasta/Nucleous"/>
+    </source>
+    <source name="creinhardtiiChloroplast-chromosome-fasta" type="fasta" dump="true">
+      <property name="fasta.className" value="org.intermine.model.bio.Chromosome"/>
+      <property name="fasta.dataSourceName" value="GenBank"/>
+      <property name="fasta.dataSetTitle" value="GenBank Chlamydomonas reinhardtii Chloroplast"/>
+      <property name="fasta.taxonId" value="3055"/>
+      <property name="fasta.sequenceType" value="protein"/>
+      <property name="fasta.includes" value="*.fasta"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/genome/fasta/Chloroplast"/>
+    </source>
+    <source name="creinhardtiiMitochondrion-chromosome-fasta" type="fasta" dump="true">
+      <property name="fasta.className" value="org.intermine.model.bio.Chromosome"/>
+      <property name="fasta.dataSourceName" value="GenBank"/>
+      <property name="fasta.dataSetTitle" value="GenBank Chlamydomonas reinhardtii Mitochondrion"/>
+      <property name="fasta.taxonId" value="3055"/>
+      <property name="fasta.sequenceType" value="protein"/>
+      <property name="fasta.includes" value="*.fasta"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/genome/fasta/Mitochondrion"/>
+    </source>
+    <source name="go" type="go">
+      <!--property name="src.data.file" location="/home/rdorado/Creinhardtii/phycomine/go/go.obo"/-->
+      <property name="src.data.file" location="/home/rdorado/Creinhardtii/phycomine/go/go-basic.obo"/>
+      <property name="createrelations" value="false"/>
+    </source>
+    <source name="go-annotation" type="go-annotation" dump="true">
+      <!--property name="ontologyfile" location="/home/rdorado/Creinhardtii/phycomine/go/go.obo"/-->
+      <property name="src.data.file" location="/home/rdorado/Creinhardtii/phycomine/go/go-basic.obo"/>
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/go-annotation/"/>
+    </source>
+    <source name="kegg-pathway" type="kegg-pathway">
+      <property name="src.data.dir" location="/home/rdorado/Creinhardtii/phycomine/kegg"/>
+      <property name="kegg.organisms" value="3055"/>
+    </source>
+    <!--
+      I have no idea where update-publication will get data from
+    -->
+    <source name="update-publications" type="update-publications">
+      <property name="src.data.file" location="build/publications.xml"/>
+    </source>
+    <source name="entrez-organism" type="entrez-organism">
+      <property name="src.data.file" location="build/organisms.xml"/>
+    </source>
+  </sources>
+
+  <post-processing>
+    <post-process name="create-references"/>
+    <post-process name="transfer-sequences" dump="true"/>
+
+    <!-- this runs the postprocessing steps in all sources -->
+    <post-process name="do-sources"/>
+
+    <post-process name="summarise-objectstore"/>
+    <post-process name="create-autocomplete-index"/>
+    <post-process name="create-search-index"/>
+
+    <post-process name="populate-child-features"/>
+  </post-processing>
+
+</project>
+

@@ -80,7 +80,7 @@
   <h3>GeneAtlas Scatter Plot</h3>
   <div id="Chart-scatterplot"></div>
 
-  <form id="gene-atlas-options-Scatter" class="gene-atlas-options">
+  <!--form id="gene-atlas-options-Scatter" class="gene-atlas-options">
     <table cellspacing="0">
       <tbody>
         <tr>
@@ -95,7 +95,7 @@
         </tr>
       </tbody>
     </table>
-  </form>
+  </form-->
 </div>
 
 <div>

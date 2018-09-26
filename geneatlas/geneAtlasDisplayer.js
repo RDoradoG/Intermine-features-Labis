@@ -652,18 +652,30 @@ function setScatterPlot(seta, setb) {
 	var secondLabel             = experimentSelect_second + ' (' + experimentType_second +')';
 	var data                    = new google.visualization.DataTable();
 
-	data.addColumn('number', 'Expression Value', 'expressionValueA');
-	data.addColumn('number', 'Expression Value', 'expressionValueB');
+	data.addColumn('number', 'Expression Value A', 'expressionValueA');
+	//data.addColumn('number', 'Expression Value B', 'expressionValueB');
+	var first_array = [];
+	first_array.push(null);
+	for (var i = 0; i < seta.length; i++) {
+		data.addColumn('number', seta[i]['ExpressionValues.condition.name'].value + ' - ' + setb[i]['ExpressionValues.condition.name'].value);
+		first_array.push(null);
+	}
 
-	jQuery('#pairConditios').html('');
-	fillAOption('pairConditios', '-- SELECT --', true);
+
+	//jQuery('#pairConditios').html('');
+	//fillAOption('pairConditios', '-- SELECT --', true);
 
 	var allDataScatter = [];
+	//var allDataScatter_example = [];
 	for (var i = 0; i < seta.length; i++) {
-		allDataScatter.push([seta[i]['ExpressionValues.expressionValue'].value, setb[i]['ExpressionValues.expressionValue'].value]);
-		allConditions.push([seta[i]['ExpressionValues.condition.name'].value, setb[i]['ExpressionValues.condition.name'].value]);
-		var label = seta[i]['ExpressionValues.condition.name'].value + ' - ' + setb[i]['ExpressionValues.condition.name'].value;
-		fillAOption('pairConditios', label, false);
+		var this_array    = clone(first_array)
+		this_array[0]     = seta[i]['ExpressionValues.expressionValue'].value;
+		this_array[i + 1] = setb[i]['ExpressionValues.expressionValue'].value
+		allDataScatter.push(this_array);
+		//allDataScatter.push([seta[i]['ExpressionValues.expressionValue'].value, setb[i]['ExpressionValues.expressionValue'].value]);
+		//allConditions.push([seta[i]['ExpressionValues.condition.name'].value, setb[i]['ExpressionValues.condition.name'].value]);
+		//var label = seta[i]['ExpressionValues.condition.name'].value + ' - ' + setb[i]['ExpressionValues.condition.name'].value;
+		//fillAOption('pairConditios', label, false);
 	}
 
 	data.addRows(allDataScatter);
@@ -680,14 +692,14 @@ function setScatterPlot(seta, setb) {
 
 	/*----------  Add listener to get the name of the conditions  ----------*/
 	
-	google.visualization.events.addListener(chartScatter, 'select', function() {
+	/*google.visualization.events.addListener(chartScatter, 'select', function() {
     	var valueSelect = chartScatter.getSelection()
     	if (valueSelect.length > 0) {
     		setValuePairConditios(valueSelect[0].row + 1);
     	} else {
     		setValuePairConditios(0);
     	}
-    });
+    });*/
 }
 
 /**

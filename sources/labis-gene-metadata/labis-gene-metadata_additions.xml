@@ -19,9 +19,7 @@
   <class name="ExpressionValues" is-interface="true">
     <!--attribute name="condition" type="java.lang.String" /-->
     <attribute name="expressionValue" type="java.lang.Float" />
-
     <reference name="condition" referenced-type="ExperimentConditions" reverse-reference="expressionValue" />
-
     <reference name="gene" referenced-type="Gene" reverse-reference="expressionValue" />
     <reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="expressionValue" />
     <reference name="type" referenced-type="ExpressionTypeDiccionary" reverse-reference="expressionValue" />
@@ -35,33 +33,31 @@
     <attribute name="source" type="java.lang.String" />
     <attribute name="selection" type="java.lang.String" />
     <attribute name="layout" type="java.lang.String" />
-
     <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="condition"/>
-
     <!--reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="conditions" /-->
   </class>
 
   <class name="GeneFamilies" is-interface="true">
     <attribute name="name" type="java.lang.String" />
+    <attribute name="dbLink" type="java.lang.String" />
+    <reference name="type" referenced-type="TypeGeneFamily" reverse-reference="geneFamily"/>
+    <collection name="geneFamily" referenced-type="GeneFamiliesGenes" reverse-reference="geneFamily"/>
+  </class>
+
+  <class name="GeneFamiliesGenes" is-interface="true">
     <attribute name="description" type="java.lang.String" />
-    <reference name="db_link" referenced-type="Db_link" reverse-reference="geneFamilie"/>
-    <collection name="geneFamilies_gene" referenced-type="GeneFamilies_gene" reverse-reference="geneFamilie"/>
+    <reference name="geneFamily" referenced-type="GeneFamilies" reverse-reference="geneFamily"/>
+    <reference name="gene" referenced-type="Gene" reverse-reference="geneFamily"/>
   </class>
 
-  <class name="GeneFamilies_gene" is-interface="true">
-    <reference name="gene" referenced-type="Gene" reverse-reference="geneFamilie"/>
-    <reference name="geneFamilie" referenced-type="GeneFamilies" reverse-reference="geneFamilies_gene"/>
-  </class>
-
-  <class name="Db_link" is-interface="true">
+  <class name="TypeGeneFamily" is-interface="true">
     <attribute name="name" type="java.lang.String" />
-    <attribute name="link" type="java.lang.String" />
-    <collection name="geneFamilie" referenced-type="GeneFamilies" reverse-reference="db_link"/>
+    <collection name="geneFamily" referenced-type="GeneFamilies" reverse-reference="type"/>
   </class>
 
   <class name="Gene" is-interface="true">
     <collection name="expressionValue" referenced-type="ExpressionValues" reverse-reference="gene"/>
-    <collection name="geneFamilie" referenced-type="GeneFamilies_gene" reverse-reference="gene"/>
+    <collection name="geneFamily" referenced-type="GeneFamiliesGenes" reverse-reference="gene"/>
   </class>
 
   <class name="Publication" is-interface="true">
