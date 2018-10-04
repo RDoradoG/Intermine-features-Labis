@@ -37,15 +37,6 @@ function filTypeExperiment(result, addID) {
 	}
 }
 
-function fillAOption(id, value, selected) {
-	var option = jQuery("<option></option>").attr("value", value).text(value);
-	if (selected) {
-		option.attr("selected", "selected");
-	}
-	jQuery('#' + id).append(option);
-}
-
-
 jQuery('#experimentType').change(function() {
 	ChangeExperimentType(this.value, '');
 });
@@ -99,8 +90,7 @@ function getExpressionValues(addID) {
 	query += '<constraint path="ExpressionValues.gene" op="IN" value="' + bagName + '" code="C" />';
 	query += '</query>';
 	//APIExecuteQuery(query, 'ExpressionValues');
-	console.log(query)
-	APIExecuteQuery(query, {key: 'ExpressionValues', addID: addID});
+	APIExecuteQuery(query, {key: 'ExpressionValues', addID: addID}, undefined, max_consitions_genes);
 }
 
 function ChangeExperimentType(value, addID) {
@@ -213,103 +203,112 @@ function drawCanvas(dataForCanvas, Mean, max, min, sizeData, title, addID){
 			jQuery('#heatmap_div').remove();
 			jQuery('#expression_div').html('<i>Too many elements, please select a subset to see the heat maps.</i>');
 		} else {
-			jQuery("#description").hide();
-			jQuery("#description_div").click(function () {
-				if(jQuery("#description").is(":hidden")) {
-					jQuery("#co").attr("src", "images/disclosed.gif");
-				} else {
-					jQuery("#co").attr("src", "images/undisclosed.gif");
-				}
-					jQuery("#description").toggle("slow");
-			});
-
-			jQuery('#hierarchicalSelect' + addID).val('single');
-			jQuery('#kMenasSelect' + addID).val('3');
-
-			var Deviation                    = getDeviation(dataForCanvas.y.data, sizeData, Mean);
-			dataForCanvas.y.data             = setZScores(dataForCanvas.y.data, Mean, Deviation);
-			max                              = getAZSCore(max, Mean, Deviation);
-			min                              = getAZSCore(min, Mean, Deviation) * (-1);
-			max                              = Math.ceil(max);
-			min                              = Math.ceil(min);
-
-			if (max < min) {
-				max = min;
+			if (dataForCanvas.y.data.length !=  dataForCanvas.y.vars.length) {
+				jQuery('#heatmap_div').remove();
+				jQuery('#expression_div').html('<i>Expression scores are not available</i>');
+			}else{
+				drawCanvasexecute(dataForCanvas, Mean, max, min, sizeData, title, addID);
 			}
-
-			// hm - heatmap; cl - cellline; ds - developmentalstage; hc - hierarchical clustering; km - kmeans
-			min = max * (-1);
-			var hm_cl = new CanvasXpress(
-				'canvas_cl' + addID,
-				dataForCanvas,
-				{
-					graphType: 'Heatmap',
-					title: title,
-					// heatmapType: 'yellow-purple',
-					dendrogramSpace: 6,
-					smpDendrogramPosition: 'right',
-					varDendrogramPosition: 'bottom',
-					setMin: min,
-					setMax: max,
-					varLabelRotate: 45,
-					centerData: false,
-					missingDataColor: 'rgb(255, 255, 0)',
-					//colorSpectrum: ['#920000', '#009292'],
-					autoExtend: true
-				},
-				{
-					click: function(o) {
-						if (o != undefined) {
-							var featureId    = o.y.smps;
-							var query        = '<query model="genomic" view="Gene.primaryIdentifier" sortOrder="Gene.primaryIdentifier ASC" >';
-							query += '<constraint path="Gene.primaryIdentifier" op="=" value="' + featureId + '" code="A" />';
-							query += '</query>';
-							//APIExecuteQuery(query, 'getURL');
-							APIExecuteQuery(query, {key: 'getURL', addID: addID});
-						}
-					}
-				}
-			);
-
-			// cluster on gene/exons
-			if (feature_count > max_cluster) {
-				jQuery("#hierarchicalSelect" + addID).attr('disabled', true);
-			}
-
-			jQuery('#kMenasSelect' + addID).html('<option value="3" selected="selected">3</option>');
-			if (feature_count > 3 && feature_count <= max_cluster) {
-				hm_cl.clusterSamples();
-				hm_cl.kmeansSamples();
-				for (var i=4; i < feature_count; ++i) {
-					jQuery('#kMenasSelect' + addID).
-					append(jQuery("<option></option>").
-					attr("value",i).
-					text(i));
-				}
-			} else {
-				jQuery("#kMenasSelect" + addID).attr('disabled', true);
-			}
-
-			// cluster on conditions
-			if (feature_count <= max_cluster) {
-				hm_cl.clusterVariables(); // clustering method will call draw action within it.
-				hm_cl.draw();
-			}
-
-			jQuery('#hierarchicalSelect' + addID).change(function() {
-				hm_cl.linkage = this.value;
-				if (feature_count >= 3) { hm_cl.clusterSamples(); }
-				hm_cl.clusterVariables();
-				hm_cl.draw();
-			});
-
-			jQuery('#kMenasSelect' + addID).change(function() {
-				hm_cl.kmeansClusters = parseInt(this.value);
-				hm_cl.kmeansSamples();
-				hm_cl.draw();
-			});
 		}
 	}
+}
+
+function drawCanvasexecute(dataForCanvas, Mean, max, min, sizeData, title, addID){
+	jQuery("#description").hide();
+	jQuery("#description_div").click(function () {
+		if(jQuery("#description").is(":hidden")) {
+			jQuery("#co").attr("src", "images/disclosed.gif");
+		} else {
+			jQuery("#co").attr("src", "images/undisclosed.gif");
+		}
+			jQuery("#description").toggle("slow");
+	});
+
+	jQuery('#hierarchicalSelect' + addID).val('single');
+	jQuery('#kMenasSelect' + addID).val('3');
+
+	var Deviation                    = getDeviation(dataForCanvas.y.data, sizeData, Mean);
+	dataForCanvas.y.data             = setZScores(dataForCanvas.y.data, Mean, Deviation);
+	max                              = getAZSCore(max, Mean, Deviation);
+	min                              = getAZSCore(min, Mean, Deviation) * (-1);
+	max                              = Math.ceil(max);
+	min                              = Math.ceil(min);
+
+	if (max < min) {
+		max = min;
+	}
+
+	// hm - heatmap; cl - cellline; ds - developmentalstage; hc - hierarchical clustering; km - kmeans
+	min = max * (-1);
+	var hm_cl = new CanvasXpress(
+		'canvas_cl' + addID,
+		dataForCanvas,
+		{
+			graphType: 'Heatmap',
+			title: title,
+			// heatmapType: 'yellow-purple',
+			dendrogramSpace: 6,
+			smpDendrogramPosition: 'right',
+			varDendrogramPosition: 'bottom',
+			setMin: min,
+			setMax: max,
+			varLabelRotate: 45,
+			centerData: false,
+			missingDataColor: 'rgb(255, 255, 0)',
+			//colorSpectrum: ['#920000', '#009292'],
+			autoExtend: true
+		},
+		{
+			click: function(o) {
+				if (o != undefined) {
+					var featureId    = o.y.smps;
+					var query        = '<query model="genomic" view="Gene.primaryIdentifier" sortOrder="Gene.primaryIdentifier ASC" >';
+					query += '<constraint path="Gene.primaryIdentifier" op="=" value="' + featureId + '" code="A" />';
+					query += '</query>';
+					//APIExecuteQuery(query, 'getURL');
+					APIExecuteQuery(query, {key: 'getURL', addID: addID});
+				}
+			}
+		}
+	);
+
+	// cluster on gene/exons
+	if (feature_count > max_cluster) {
+		jQuery("#hierarchicalSelect" + addID).attr('disabled', true);
+	}
+
+	jQuery('#kMenasSelect' + addID).html('<option value="3" selected="selected">3</option>');
+	if (feature_count > 3 && feature_count <= max_cluster) {
+		hm_cl.clusterSamples();
+		hm_cl.kmeansSamples();
+		for (var i=4; i < feature_count; ++i) {
+			jQuery('#kMenasSelect' + addID).
+			append(jQuery("<option></option>").
+			attr("value",i).
+			text(i));
+		}
+	} else {
+		jQuery("#kMenasSelect" + addID).attr('disabled', true);
+	}
+
+	// cluster on conditions
+	if (feature_count <= max_cluster) {
+		hm_cl.clusterVariables(); // clustering method will call draw action within it.
+		hm_cl.draw();
+	}
+
+	jQuery('#hierarchicalSelect' + addID).change(function() {
+		hm_cl.linkage = this.value;
+		if (feature_count >= 3) { hm_cl.clusterSamples(); }
+		hm_cl.clusterVariables();
+		hm_cl.draw();
+	});
+
+	jQuery('#kMenasSelect' + addID).change(function() {
+		hm_cl.kmeansClusters = parseInt(this.value);
+		hm_cl.kmeansSamples();
+		hm_cl.draw();
+	});
 }
 
 function getDeviation(arrayData, sizeData, Mean) {

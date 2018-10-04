@@ -9,7 +9,10 @@
 <tiles:importAttribute />
 
 <!--[if IE]><script type="text/javascript" src="model/canvasXpress/js/excanvas.js"></script><![endif]-->
-<script type="text/javascript" src="model/canvasXpress/js/canvasXpress.min.js"></script>
+<!--script type="text/javascript" src="model/canvasXpress/js/canvasXpress.min.js"></script-->
+
+<link rel="stylesheet" href="model/style/canvasXpress.css" type="text/css"/>
+<script type="text/javascript" src="model/js/canvasXpress.min.js"></script>
 
 <div class="body" id="expression_div">
 
@@ -44,6 +47,7 @@ jQuery(document).ready(function () {
 
 <c:set var="MAX_CLUSTER" value="250" />
 <c:set var="MAX_MAP" value="600" />
+<c:set var="MAX_CONDITIONS_GENES" value="10000" />
 <c:set var="MAX_DEFAULT_OPEN" value="100" />
     <div id="heatmap_div">
         <p>
@@ -96,7 +100,7 @@ jQuery(document).ready(function () {
 
                       <span>Experiment:</span>
                       <select id="experimentSelect"></select>
-                      <span>Cell Line Clustering - Hierarchical:</span>
+                      <!--span>Cell Line Clustering - Hierarchical:</span>
                       <select id="hierarchicalSelect">
                         <option value="single" selected="selected">Single</option>
                         <option value="complete">Complete</option>
@@ -105,7 +109,7 @@ jQuery(document).ready(function () {
                       <span> and K-means:</span>
                       <select id="kMenasSelect">
                         <option value="3" selected="selected">3</option>
-                      </select>
+                      </select-->
                     </div>
                     <div id="set_canvas">
                       <canvas id="canvas_cl" width="700" height="550"></canvas>
@@ -180,19 +184,20 @@ modENCODE submission</a>, with links to the original score files for <a href="ht
 </div>
 
 <script type="text/javascript">
-  var types           = ${type};
-  var Genes           = ${gene};
-  var defaultValues   = ${defaultValues};
-  var bagName         = '${ListName}';
-  var webAppPath      = "${WEB_PROPERTIES['webapp.path']}";
-  var api_key         = '${APIKey}';
-  var feature_count   = parseInt(${FeatureCount});
-  var max_cluster     = parseInt(${MAX_CLUSTER});
-  var max_map         = parseInt(${MAX_MAP});
+  var types                = ${type};
+  var Genes                = ${gene};
+  var defaultValues        = ${defaultValues};
+  var bagName              = '${ListName}';
+  var webAppPath           = "${WEB_PROPERTIES['webapp.path']}";
+  var api_key              = '${APIKey}';
+  var feature_count        = parseInt(${FeatureCount});
+  var max_cluster          = parseInt(${MAX_CLUSTER});
+  var max_map              = parseInt(${MAX_MAP});
+  var max_consitions_genes = parseInt(${MAX_CONDITIONS_GENES});
   
-  var typeSelected    = '';
-  var experiment      = '';
-  var arrayConditions = [];
+  var typeSelected         = '';
+  var experiment           = '';
+  var arrayConditions      = [];
 </script>
 <script src="model/js/libraryIntermine.js" charset="UTF-8"></script>
 <script type="text/javascript" src="model/js/heatMap.js"></script>
