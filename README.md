@@ -12,6 +12,10 @@ Files to implement the sources needed in HeatMap and geneAtlas. [Installation of
 	
 Files to implement the heatMap Genes feature. [Installation of heatMap Labis USP](http://200.144.244.208:6677/LABIS_wiki/doku.php?id=labiscomp:install_heatmap "Labis USP heatMap")
 
+### ScatterplotGenes
+	
+Files to implement the Scatterplot Genes feature. [Installation of ScatterplotGenes Labis USP](http://200.144.244.208:6677/LABIS_wiki/doku.php?id=labiscomp:install_scatterplotgenes "Labis USP ScatterplotGenes")
+
 ### GeneAtlas
 
 Files to implement the Gene Atlas feature. [Installation of GeneAtlas Labis USP](http://200.144.244.208:6677/LABIS_wiki/doku.php?id=labiscomp:install_geneatlas "Labis USP GeneAtlas")
