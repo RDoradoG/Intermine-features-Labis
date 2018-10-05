@@ -7,7 +7,7 @@
 
 <c:if test="${TypeDiccionary != '[]'}">
 <div>
-  <h3>GeneAtlas adult tissue expression</h3>
+  <h3>GeneAtlas Expression Values</h3>
   <div id="geneatlas-viz"></div>
 
   <form id="gene-atlas-options" class="gene-atlas-options">
