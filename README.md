@@ -19,3 +19,7 @@ Files to implement the Scatterplot Genes feature. [Installation of ScatterplotGe
 ### GeneAtlas
 
 Files to implement the Gene Atlas feature. [Installation of GeneAtlas Labis USP](http://200.144.244.208:6677/LABIS_wiki/doku.php?id=labiscomp:install_geneatlas "Labis USP GeneAtlas")
+
+## Chlamydomona Reinhardtii Data
+
+All the information of the micro algea Chlamydomona reinhardtii is in the compress file Creinhardtii.tar.gz in Phycomine folder.
