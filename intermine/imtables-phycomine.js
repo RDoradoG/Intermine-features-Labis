@@ -12604,7 +12604,7 @@ function extend() {
             Enabled: true
           },
           Galaxy: {
-            Main: "http://192.168.56.105:8080",
+            Main: "http://200.144.244.208:6677/galaxy/",
             Current: null,
             Tool: 'phycomine',
             Save: false,
