@@ -90,7 +90,9 @@ def setSrrMetaData(srrArray):
 			row['Condition'] = 'X' + srr['Condition']
 		else:
 			row['Condition'] = srr['Condition']
-		row['metaData']  = getEsummary(srr['SRR'])
+
+		row['metaData'] = getEsummary(srr['SRR'])
+		row['SRR']      = srr['SRR']
 		result.append(row)
 	return result
 
@@ -147,12 +149,12 @@ def buildFile(data, experiment, filename):
 	fileToWrite = filename + "-" + experiment + ".txt"
 	printMessage("Create and write file: " + fileToWrite)
 	file        = open(fileToWrite, "w")
-	titles      = "experiment\tName\tDescription\tinstrument\tstrategy\tsource\tselection\tlayout" #\tconstructionProtocol"
+	titles      = "experiment\tName\tDescription\tinstrument\tstrategy\tsource\tselection\tlayout\tSRR Number" #\tconstructionProtocol"
 	file.write(titles + "\n")
 	for info in data:
 		row      = info['metaData'][0]['data']
 		rowText  = experiment
-		rowText  = rowText + "\t" + info['Condition']
+		rowText  = rowText + "\t" + takeOffSalmon(info['Condition'], '_salmon')
 		rowText  = rowText + "\t" + row['Title']
 		rowText  = rowText + "\t" + row['Instrument']['instrument_model']
 		rowText  = rowText + "\t" + row['Library_descriptor']['LIBRARY_STRATEGY']['value']
@@ -160,8 +162,15 @@ def buildFile(data, experiment, filename):
 		rowText  = rowText + "\t" + row['Library_descriptor']['LIBRARY_SELECTION']['value']
 		rowText  = rowText + "\t" + row['Library_descriptor']['LIBRARY_LAYOUT']['properties'][0]
 		#rowText = rowText + "\t" + row['Library_descriptor']['LIBRARY_CONSTRUCTION_PROTOCOL']
+		rowText = rowText + "\t" + info['SRR']
 		file.write(rowText.encode('utf8') + "\n")
 	file.close()
+
+def takeOffSalmon(var, key):
+	if var.endswith(key):
+		return var[:-len(key)]
+
+	return var
 
 def printMessage(message):
 	print message + "\n"

@@ -6,7 +6,7 @@
 #$ -pe threads 3
 #$ -N bbduk
 #$ -t {sra number}
-#$ -hold_jid dump_SRR*
+#$ -hold_jid dump_*
 
 OUTDIR=Clean
 mkdir -p $OUTDIR
@@ -16,7 +16,7 @@ infile_R2=${infile_R1/_1.fastq.gz/_2.fastq.gz}
 BASE=${infile_R1/_1.fastq.gz}
 outfile_R1="$OUTDIR"/"$BASE"_clean_R1.fastq.gz
 outfile_R2="$OUTDIR"/"$BASE"_clean_R2.fastq.gz
-stat_out="$OUTDIR"/"$BASE"_clean_stats.txt]
+stat_out="$OUTDIR"/"$BASE"_clean_stats.txt
 stat_perrefout="$OUTDIR"/"$BASE"_clean_perrefstats.txt
 echo Processing $BASE
 

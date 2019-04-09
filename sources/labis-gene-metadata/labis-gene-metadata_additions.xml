@@ -5,6 +5,8 @@
   <class name="ExperimentDescription" is-interface="true">
     <attribute name="name" type="java.lang.String" />
     <attribute name="description" type="java.lang.String" />
+    <attribute name="experimentTitle" type="java.lang.String" />
+    <attribute name="accession" type="java.lang.String" />
     <reference name="publication" referenced-type="Publication" reverse-reference="experimentDescription"/>
     <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="experiment"/>
     <!--collection name="conditions"  referenced-type="ExperimentConditions" reverse-reference="experiment"/-->
@@ -33,6 +35,7 @@
     <attribute name="source" type="java.lang.String" />
     <attribute name="selection" type="java.lang.String" />
     <attribute name="layout" type="java.lang.String" />
+    <attribute name="srrNumber" type="java.lang.String" />
     <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="condition"/>
     <!--reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="conditions" /-->
   </class>
@@ -56,11 +59,32 @@
   </class>
 
   <class name="Gene" is-interface="true">
+    <reference name="ortholog" referenced-type="Ortholog" reverse-reference="gene"/>
     <collection name="expressionValue" referenced-type="ExpressionValues" reverse-reference="gene"/>
     <collection name="geneFamily" referenced-type="GeneFamiliesGenes" reverse-reference="gene"/>
+    <collection name="genomicProtein" referenced-type="GenomicProtein" reverse-reference="genesGP"/>
   </class>
 
   <class name="Publication" is-interface="true">
     <collection name="experimentDescription" referenced-type="ExperimentDescription" reverse-reference="publication"/>
   </class>
+
+  <class name="Transcript" is-interface="true">
+    <attribute name="description" type="java.lang.String" />
+  </class>
+
+  <class name="GenomicProtein" extends="Protein" is-interface="true">
+    <!--attribute name="molecularWeight" type="java.lang.Integer"/>
+    <attribute name="length" type="java.lang.Integer"/-->
+    <!--reference name="sequence" referenced-type="Sequence"/-->
+    <!--collection name="CDSs" referenced-type="CDS" reverse-reference="protein"/-->
+    <collection name="genesGP" referenced-type="Gene" reverse-reference="genomicProtein"/>
+    <!--collection name="transcripts" referenced-type="Transcript" reverse-reference="genomicProtein"/-->
+  </class>
+
+  <class name="Ortholog" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <collection name="gene" referenced-type="Gene" reverse-reference="ortholog"/>
+  </class>
+
 </classes>

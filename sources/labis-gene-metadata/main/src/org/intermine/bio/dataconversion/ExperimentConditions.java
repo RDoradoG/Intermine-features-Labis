@@ -1,22 +1,17 @@
 package org.intermine.bio.dataconversion;
 
-/*
- * Copyright (C) 2002-2016 FlyMine
+/**
+ * Labis - IQ, USP. São Paulo
  *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  See the LICENSE file for more
- * information or http://www.gnu.org/copyleft/lesser.html.
- *
+ * Described class of Experiment Conditions  
+ * 
+ * @author Rodrigo Dorado
  */
+
 import org.apache.commons.lang.StringUtils;
 import org.intermine.xml.full.Item;
 import org.intermine.objectstore.ObjectStoreException;
 
-/**
- *
- * @author
- */
 public class ExperimentConditions extends NewObjectModel
 {
 	private String name;
@@ -26,7 +21,8 @@ public class ExperimentConditions extends NewObjectModel
 	private String source;
 	private String selection;
 	private String layout;
-
+	private String srrNumber;
+	
 	public ExperimentConditions() throws Exception {
         this.setClassName("ExperimentConditions");
     }
@@ -87,6 +83,14 @@ public class ExperimentConditions extends NewObjectModel
 		return this.layout;
 	}
 
+	public void setSrrNumber(String srrNumber) throws Exception {
+		this.srrNumber = srrNumber;
+	}
+
+	public String getSrrNumber() throws Exception {
+		return this.srrNumber;
+	}
+
 	public Item save(Item score) throws ObjectStoreException, Exception {
 		score.setAttribute("name", getName());
 		score.setAttribute("description", getDescription());
@@ -95,6 +99,7 @@ public class ExperimentConditions extends NewObjectModel
 		score.setAttribute("source", getSource());
 		score.setAttribute("selection", getSelection());
 		score.setAttribute("layout", getLayout());
+		score.setAttribute("srrNumber", getSrrNumber());
         return score;
 	}
 }

@@ -1,14 +1,13 @@
 package org.intermine.bio.dataconversion;
 
-/*
- * Copyright (C) 2002-2016 FlyMine
+/**
+ * Labis - IQ, USP. São Paulo
  *
- * This code may be freely distributed and modified under the
- * terms of the GNU Lesser General Public Licence.  This should
- * be distributed with the code.  See the LICENSE file for more
- * information or http://www.gnu.org/copyleft/lesser.html.
- *
+ * Described class of Error Logs
+ * 
+ * @author Rodrigo Dorado
  */
+
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
 import java.util.Random;
@@ -32,20 +31,12 @@ import org.intermine.objectstore.ObjectStoreException;
 import org.intermine.util.FormattedTextParser;
 import org.intermine.xml.full.Item;
 
-/**
- *
- * @author
- */
 public class ErrorLog
 {
 	private String LOGFILE;
     private static Logger LOGGER = null;
-
     private String actualFileName;
 
-	/**
-     * Constructor
-     */
     public ErrorLog(String logFile) throws IOException {
     	this.LOGFILE = logFile;
     	setFileHandler();

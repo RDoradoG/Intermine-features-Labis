@@ -18,9 +18,12 @@ setIDColumn <- function(data, experiment, type) {
   dtfr.salmon <- data.frame(data)
   odlnames <- colnames(dtfr.salmon)
   dtfr.salmon[,'gene_id'] <- row.names(dtfr.salmon)
-  dtfr.salmon[,'experiment'] <- experiment
+  #dtfr.salmon[,'experiment'] <- experiment
+  dtfr.salmon[,'experiment'] <- gsub('_salmon', '', experiment)
   dtfr.salmon[,'type'] <- type
   dtfr.salmon <- dtfr.salmon[c(setdiff(names(dtfr.salmon), odlnames), odlnames)]
+  odlnames <- colnames(dtfr.salmon)
+  colnames(dtfr.salmon) <- gsub('_salmon', '', odlnames)
   return(dtfr.salmon)
 }
 
@@ -104,11 +107,12 @@ runTXimport <- function(dir, salmonDir, OSSep, del, experiment, type, newDir, fi
   files <- file.path(dir, salmonDir, list.files(paste(dir, salmonDir, sep = OSSep)), fileExt)
   names(files) <- getNames(files, del = del, sep = OSSep)
   txi.salmon <- tximport(files, type = "salmon", txOut = TRUE)
+  headCRF = head(txi.salmon$counts)
   counts <- setIDColumn(txi.salmon$counts, experiment, type)
   abundance <- setIDColumn(txi.salmon$abundance, experiment, type)
   createFolder(dir, newDir)
   write.table(counts, file = paste(type_execution, 'counts_', filename, sep = ''), sep = "\t", quote = FALSE, row.names = FALSE)
-  write.table(abundance, file = paste(type_execution, 'abundace_', filename, sep = ''), sep = "\t", quote = FALSE, row.names = FALSE)
+  write.table(abundance, file = paste(type_execution, 'abundance_', filename, sep = ''), sep = "\t", quote = FALSE, row.names = FALSE)
 }
 
 setwd("/home/rdorado/Chlamy/")
