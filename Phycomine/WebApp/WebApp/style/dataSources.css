@@ -1,0 +1,15 @@
+.phycomineDataSources {
+	padding: 5px 25px;
+}
+
+.phycomineDataSources table {
+	width: 95%;
+}
+
+.phycomineDataSources table th {
+	background-color: #60a660 !important;
+}
+
+.phycomineDataSources table th h2{
+	color: white !important;
+}

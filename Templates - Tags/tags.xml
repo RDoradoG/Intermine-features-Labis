@@ -1,0 +1,332 @@
+<tags>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Experiment_Experiment_Conditions" type="template">
+  </tag>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Expression_Type_Experiment" type="template">
+  </tag>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Author_PubMedId_Experiments" type="template">
+  </tag>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Gene_Experiment_Expression_Values " type="template">
+  </tag>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Organism_Experiments " type="template">
+  </tag>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Gene_Experiment_Expression_Values" type="template">
+  </tag>
+
+  <tag name="im:aspect:Expressions" objectIdentifier="Organism_Experiments" type="template">
+  </tag>
+
+  <tag name="im:aspect:Families" objectIdentifier="Gene_Family_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Families" objectIdentifier="Gene_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:aspect:Families" objectIdentifier="Type_Gene_Families_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Families" objectIdentifier="Gene_Family_type_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:aspect:Functions" objectIdentifier="Organism_Genes_GO_Terms" type="template">
+  </tag>
+
+  <tag name="im:aspect:Functions" objectIdentifier="GO_Term_Children_Genes_Organism" type="template">
+  </tag>
+
+  <tag name="im:aspect:Functions" objectIdentifier="Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Functions" objectIdentifier="Gene_Pathways" type="template">
+  </tag>
+
+  <tag name="im:aspect:Functions" objectIdentifier="GO_ID_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Functions" objectIdentifier="Pathway_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Chromosome_All_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Chromosomal_Location" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Transcripts_Exons" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Protein_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Organism_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Organism_Genes_GO_Terms" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Symbol_Gene" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Protein" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Pathways" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:aspect:Genomics" objectIdentifier="Gene_Experiment_Expression_Values" type="template">
+  </tag>
+
+  <tag name="im:aspect:Orthologs" objectIdentifier="Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Orthologs" objectIdentifier="Gene_Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Pathways" objectIdentifier="Pathway_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Pathways" objectIdentifier="Gene_Pathways" type="template">
+  </tag>
+
+  <tag name="im:aspect:Pathways" objectIdentifier="Pathway_Category_Pathways " type="template">
+  </tag>
+
+  <tag name="im:aspect:Pathways" objectIdentifier="Pathway_Category_Pathways" type="template">
+  </tag>
+
+  <tag name="im:aspect:Proteins" objectIdentifier="Protein_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Proteins" objectIdentifier="Protein_Sequence" type="template">
+  </tag>
+
+  <tag name="im:aspect:Proteins" objectIdentifier="Gene_Protein" type="template">
+  </tag>
+
+  <tag name="im:aspect:Proteins" objectIdentifier="All_Proteins_In_Organism_To_Publications" type="template">
+  </tag>
+
+  <tag name="im:aspect:Proteins" objectIdentifier="Organism_Proteins" type="template">
+  </tag>
+
+  <tag name="im:aspect:Publications" objectIdentifier="Author_PubMedId_Experiments" type="template">
+  </tag>
+
+  <tag name="im:aspect:Publications" objectIdentifier="Author_PubMedId_Genes" type="template">
+  </tag>
+
+  <tag name="im:aspect:Publications" objectIdentifier="Author_PubMedID_Pub_Details" type="template">
+  </tag>
+
+  <tag name="im:aspect:Publications" objectIdentifier="Gene_PubMedId" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Chromosome_All_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Chromosomal_Location" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Transcripts_Exons" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Protein_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Organism_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Organism_Genes_GO_Terms" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Symbol_Gene" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Protein" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Pathways" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Protein_Sequence" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="GO_Term_Children_Genes_Organism" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="GO_ID_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Pathway_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Family_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Type_Gene_Families_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Family_type_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Author_PubMedId_Experiments" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Author_PubMedId_Genes" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Author_PubMedID_Pub_Details" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_PubMedId" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Pathway_Category_Pathways " type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Experiment_Experiment_Conditions" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Expression_Type_Experiment" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Experiment_Expression_Values " type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Organism_Experiments " type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="All_Proteins_In_Organism_To_Publications" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Gene_Experiment_Expression_Values" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Organism_Experiments" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Organism_Proteins" type="template">
+  </tag>
+
+  <tag name="im:frontpage" objectIdentifier="Pathway_Category_Pathways" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Chromosome_All_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Chromosomal_Location" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Transcripts_Exons" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Protein_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Organism_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Organism_Genes_GO_Terms" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Symbol_Gene" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Protein" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Pathways" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Protein_Sequence" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="GO_Term_Children_Genes_Organism" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Ortholog_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="GO_ID_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Pathway_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Family_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Type_Gene_Families_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Family_type_Gene_Families" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Author_PubMedId_Experiments" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Author_PubMedId_Genes" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Author_PubMedID_Pub_Details" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_PubMedId" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Pathway_Category_Pathways " type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Experiment_Experiment_Conditions" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Expression_Type_Experiment" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Experiment_Expression_Values " type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Organism_Experiments " type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="All_Proteins_In_Organism_To_Publications" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Gene_Experiment_Expression_Values" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Organism_Experiments" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Organism_Proteins" type="template">
+  </tag>
+
+  <tag name="im:public" objectIdentifier="Pathway_Category_Pathways" type="template">
+  </tag>
+</tags>

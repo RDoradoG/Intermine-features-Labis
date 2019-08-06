@@ -1,0 +1,55 @@
+<!-- /scatterplotGenes.html -->
+
+<div>
+  <html:link linkName="#" styleId="scatterPlotHideShow" id="scatterPlotHideShow" style="cursor:pointer">
+    <h3>
+      <b>Click to see/hide</b> the ScatterPlot Map<img src="images/undisclosed.gif" id="os">
+    </h3>
+  </html:link>
+</div>
+
+<div id="scatterplotGenesContainer" style="display: block">
+  <table>
+    <tr>
+      <td>
+        <div style="padding: 0px 0px 5px 30px;">
+          <span>Type:</span>
+          <select id="experimentType_scatterplotGenes_A"></select>
+
+          <span>Experiment:</span>
+          <select id="experimentSelect_scatterplotGenes_A"></select>
+
+          <span>Condition:</span>
+          <select id="conditionSelect_scatterplotGenes_A"></select>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <div style="padding: 0px 0px 5px 30px;">
+          <span>Type:</span>
+          <select id="experimentType_scatterplotGenes_B"></select>
+
+          <span>Experiment:</span>
+          <select id="experimentSelect_scatterplotGenes_B"></select>
+
+          <span>Condition:</span>
+        <select id="conditionSelect_scatterplotGenes_B"></select>
+        </div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <div id="set_canvas_scatterplotGenes">
+          <canvas id="scatterplotGenes_canvas" width="700" height="550"></canvas>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<script type="text/javascript" src="model/js/scatterplotGenes.js"></script>
+
+<!-- /scatterplotGenes.html -->

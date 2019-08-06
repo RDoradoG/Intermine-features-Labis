@@ -1,0 +1,159 @@
+<template-queries>
+<template name="All_Proteins_In_Organism_To_Publications" title="All proteins in organism --&gt; Publications." comment="">
+  <query name="All_Proteins_In_Organism_To_Publications" model="genomic" view="Protein.primaryIdentifier Protein.primaryAccession Protein.organism.name Protein.publications.firstAuthor Protein.publications.title Protein.publications.year Protein.publications.journal Protein.publications.volume Protein.publications.pages Protein.publications.pubMedId" longDescription="" sortOrder="Protein.primaryIdentifier asc">
+    <constraint path="Protein.organism.name" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Author_PubMedId_Experiments" title="Author + PubMedId --&gt; Experiments" comment="">
+  <query name="Author_PubMedId_Experiments" model="genomic" view="ExperimentDescription.description ExperimentDescription.name ExperimentDescription.experimentTitle ExperimentDescription.accession" longDescription="" sortOrder="ExperimentDescription.description asc" constraintLogic="A and B">
+    <constraint path="ExperimentDescription.publications.firstAuthor" code="A" editable="true" op="=" value="Goodenough U"/>
+    <constraint path="ExperimentDescription.publications.pubMedId" code="B" editable="true" op="=" value="24585881"/>
+  </query>
+</template>
+<template name="Author_PubMedId_Genes" title="Author + PubMedId --&gt; Genes" comment="">
+  <query name="Author_PubMedId_Genes" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.organism.shortName" longDescription="" sortOrder="Gene.primaryIdentifier asc" constraintLogic="A and B">
+    <constraint path="Gene.publications.firstAuthor" code="A" editable="true" op="=" value="Zones JM"/>
+    <constraint path="Gene.publications.pubMedId" code="B" editable="true" op="=" value="26432862"/>
+  </query>
+</template>
+<template name="Author_PubMedID_Pub_Details" title="Author + PubMedID --&gt; Pub Details" comment="">
+  <query name="Author_PubMedID_Pub_Details" model="genomic" view="Publication.firstAuthor Publication.title Publication.year Publication.journal Publication.volume Publication.pages Publication.pubMedId" longDescription="" sortOrder="Publication.firstAuthor asc" constraintLogic="A and B">
+    <constraint path="Publication.firstAuthor" code="A" editable="true" op="=" value="Miller R"/>
+    <constraint path="Publication.pubMedId" code="B" editable="true" op="=" value="20935180"/>
+  </query>
+</template>
+<template name="Chromosome_All_Genes" title="Chromosome --&gt; All Genes" comment="">
+  <query name="Chromosome_All_Genes" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.chromosome.primaryIdentifier Gene.chromosomeLocation.end Gene.chromosomeLocation.start Gene.chromosomeLocation.strand" longDescription="Get genes of a Chromosome of a Organism" sortOrder="Gene.primaryIdentifier asc" constraintLogic="A and B">
+    <constraint path="Gene.chromosome.primaryIdentifier" code="A" editable="true" op="=" value="chromosome_1"/>
+    <constraint path="Gene.organism.name" code="B" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Experiment_Experiment_Conditions" title="Experiment --&gt; Experiment Conditions" comment="">
+  <query name="Experiment_Experiment_Conditions" model="genomic" view="ExperimentDescription.expressionValue.condition.source ExperimentDescription.expressionValue.condition.description ExperimentDescription.expressionValue.condition.instrument ExperimentDescription.expressionValue.condition.layout ExperimentDescription.expressionValue.condition.name ExperimentDescription.expressionValue.condition.selection ExperimentDescription.expressionValue.condition.srrNumber ExperimentDescription.expressionValue.condition.strategy" longDescription="" sortOrder="ExperimentDescription.expressionValue.condition.source asc">
+    <constraint path="ExperimentDescription.name" editable="true" op="=" value="Zones_2015"/>
+  </query>
+</template>
+<template name="Expression_Type_Experiment" title="Expression Type --&gt; Experiment" comment="">
+  <query name="Expression_Type_Experiment" model="genomic" view="ExperimentDescription.description ExperimentDescription.name ExperimentDescription.experimentTitle ExperimentDescription.accession" longDescription="" sortOrder="ExperimentDescription.description asc">
+    <constraint path="ExperimentDescription.expressionValue.type.name" editable="true" op="=" value="transcriptomic"/>
+  </query>
+</template>
+<template name="Gene_Chromosomal_Location" title="Gene --&gt; Chromosomal Location" comment="">
+  <query name="Gene_Chromosomal_Location" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.organism.name Gene.chromosome.primaryIdentifier Gene.chromosomeLocation.end Gene.chromosomeLocation.start Gene.chromosomeLocation.strand" longDescription="" sortOrder="Gene.primaryIdentifier asc" constraintLogic="A and B">
+    <constraint path="Gene" code="B" editable="true" op="LOOKUP" value="Cre01.g000150.v5.5"/>
+    <constraint path="Gene.organism.name" code="A" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Gene_Experiment_Expression_Values" title="Gene + Experiment --&gt; Expression Values" comment="">
+  <query name="Gene_Experiment_Expression_Values" model="genomic" view="ExpressionValues.expressionValue ExpressionValues.condition.source ExpressionValues.condition.description ExpressionValues.condition.instrument ExpressionValues.condition.layout ExpressionValues.condition.name ExpressionValues.condition.selection ExpressionValues.condition.srrNumber ExpressionValues.condition.strategy" longDescription="" sortOrder="ExpressionValues.expressionValue asc" constraintLogic="A and B">
+    <constraint path="ExpressionValues.gene" code="A" editable="true" op="LOOKUP" value="Cre01.g000150.v5.5"/>
+    <constraint path="ExpressionValues.experiment.name" code="B" editable="true" op="=" value="Goodenough_2014"/>
+  </query>
+</template>
+<template name="Gene_Family_Genes" title="Gene Family --&gt; Genes" comment="">
+  <query name="Gene_Family_Genes" model="genomic" view="GeneFamilies.annotation GeneFamilies.name GeneFamilies.type.name GeneFamilies.gene.primaryIdentifier GeneFamilies.gene.secondaryIdentifier GeneFamilies.gene.symbol GeneFamilies.gene.name GeneFamilies.gene.organism.shortName GeneFamilies.dataset.name GeneFamilies.dbLink" longDescription="" sortOrder="GeneFamilies.annotation asc">
+    <constraint path="GeneFamilies.name" editable="true" op="=" value="KOG4844"/>
+  </query>
+</template>
+<template name="Gene_Family_type_Gene_Families" title="Gene Family type --&gt; Gene Families" comment="">
+  <query name="Gene_Family_type_Gene_Families" model="genomic" view="GeneFamilies.name GeneFamilies.dataset.name GeneFamilies.annotation GeneFamilies.dbLink" longDescription="" sortOrder="GeneFamilies.name asc">
+    <constraint path="GeneFamilies.type" editable="true" op="LOOKUP" value="EggNOG"/>
+  </query>
+</template>
+<template name="Gene_Gene_Families" title="Gene --&gt; Gene Families" comment="">
+  <query name="Gene_Gene_Families" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.organism.shortName Gene.geneFamily.name Gene.geneFamily.type.name Gene.geneFamily.annotation Gene.geneFamily.dataset.name Gene.geneFamily.dbLink" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene" editable="true" op="LOOKUP" value="Cre01.g000200.v5.5"/>
+  </query>
+</template>
+<template name="Gene_Ortholog_Genes" title="Gene --&gt; Ortholog --&gt; Genes" comment="">
+  <query name="Gene_Ortholog_Genes" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.organism.shortName Gene.ortholog.name Gene.ortholog.gene.primaryIdentifier Gene.ortholog.gene.secondaryIdentifier Gene.ortholog.gene.symbol Gene.ortholog.gene.name Gene.ortholog.gene.organism.shortName" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene" editable="true" op="LOOKUP" value="Cre01.g000150.v5.5"/>
+  </query>
+</template>
+<template name="Gene_Pathways" title="Gene --&gt; Pathways" comment="">
+  <query name="Gene_Pathways" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.chromosome.primaryIdentifier Gene.chromosomeLocation.start Gene.chromosomeLocation.end Gene.chromosomeLocation.strand Gene.pathways.description Gene.pathways.name" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene" editable="true" op="LOOKUP" value="Cre16.g652850.v5.5"/>
+  </query>
+</template>
+<template name="Gene_Protein" title="Gene --&gt; Proteins." comment="">
+  <query name="Gene_Protein" model="genomic" view="Gene.primaryIdentifier Gene.symbol Gene.proteins.primaryIdentifier Gene.proteins.primaryAccession" longDescription="Show the proteins for a particular gene." sortOrder="Gene.primaryIdentifier asc">
+    <pathDescription pathString="Gene.proteins" description="Protein"/>
+    <constraint path="Gene" editable="true" op="LOOKUP" value="ABRA"/>
+  </query>
+</template>
+<template name="Gene_PubMedId" title="Gene --&gt; Publication" comment="">
+  <query name="Gene_PubMedId" model="genomic" view="Gene.publications.firstAuthor Gene.publications.title Gene.publications.year Gene.publications.journal Gene.publications.volume Gene.publications.pages Gene.publications.pubMedId" longDescription="" sortOrder="Gene.publications.firstAuthor asc">
+    <constraint path="Gene" editable="true" op="LOOKUP" value="Cre01.g000150.v5.5"/>
+  </query>
+</template>
+<template name="Gene_Transcripts_Exons" title="Gene --&gt; Transcripts + Exons" comment="">
+  <query name="Gene_Transcripts_Exons" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.transcripts.primaryIdentifier Gene.transcripts.description Gene.transcripts.length Gene.transcripts.chromosome.primaryIdentifier Gene.transcripts.chromosomeLocation.start Gene.transcripts.chromosomeLocation.end Gene.transcripts.chromosomeLocation.strand Gene.transcripts.exons.primaryIdentifier Gene.transcripts.exons.length Gene.transcripts.exons.chromosomeLocation.start Gene.transcripts.exons.chromosomeLocation.end" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene" editable="true" op="LOOKUP" value="Cre01.g000200.v5.5"/>
+  </query>
+</template>
+<template name="GO_ID_Genes" title="GO Id --&gt; Genes" comment="">
+  <query name="GO_ID_Genes" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.organism.shortName Gene.goAnnotation.ontologyTerm.identifier Gene.goAnnotation.ontologyTerm.name Gene.goAnnotation.ontologyTerm.namespace" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene.goAnnotation.ontologyTerm" editable="true" op="LOOKUP" value="GO:0000053"/>
+  </query>
+</template>
+<template name="GO_Term_Children_Genes_Organism" title="GO term name [and children of this term]   --&gt; Genes in one specific organism" comment="">
+  <query name="GO_Term_Children_Genes_Organism" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.goAnnotation.ontologyTerm.identifier Gene.goAnnotation.ontologyTerm.name Gene.goAnnotation.ontologyTerm.parents.identifier Gene.goAnnotation.ontologyTerm.parents.name" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene.organism.name" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Organism_Experiments" title="Organism --&gt; Experiments" comment="">
+  <query name="Organism_Experiments" model="genomic" view="ExperimentDescription.description ExperimentDescription.name ExperimentDescription.experimentTitle ExperimentDescription.accession" longDescription="" sortOrder="ExperimentDescription.description asc">
+    <constraint path="ExperimentDescription.expressionValue.gene.organism.name" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Organism_Genes" title="Organism --&gt; Genes" comment="">
+  <query name="Organism_Genes" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name Gene.chromosome.primaryIdentifier Gene.chromosomeLocation.start Gene.chromosomeLocation.end Gene.chromosomeLocation.strand" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene.organism.name" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Organism_Genes_GO_Terms" title="Organism --&gt; Genes --&gt; GO_Terms" comment="">
+  <query name="Organism_Genes_GO_Terms" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.goAnnotation.ontologyTerm.identifier Gene.goAnnotation.ontologyTerm.name Gene.goAnnotation.ontologyTerm.description" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene.organism.name" editable="true" op="=" value="Chlamydomonas reinhardtii"/>
+  </query>
+</template>
+<template name="Organism_Proteins" title="Organism --&gt; All proteins." comment="">
+  <query name="Organism_Proteins" model="genomic" view="Protein.primaryIdentifier Protein.primaryAccession" longDescription="Show all the proteins from a particular organism." sortOrder="Protein.primaryIdentifier asc">
+    <constraint path="Protein.organism.name" editable="true" description="Show all the proteins from the organism:" op="=" value="Plasmodium falciparum 3D7"/>
+  </query>
+</template>
+<template name="Ortholog_Genes" title="Ortholog --&gt; Genes" comment="">
+  <query name="Ortholog_Genes" model="genomic" view="Ortholog.name Ortholog.gene.primaryIdentifier Ortholog.gene.secondaryIdentifier Ortholog.gene.symbol Ortholog.gene.name Ortholog.gene.organism.shortName" longDescription="" sortOrder="Ortholog.name asc">
+    <constraint path="Ortholog.name" editable="true" op="=" value="OG0000179"/>
+  </query>
+</template>
+<template name="Pathway_Category_Pathways" title="Pathway Category --&gt; Pathways" comment="">
+  <query name="Pathway_Category_Pathways" model="genomic" view="PathwayCategory.category PathwayCategory.pathways.identifier PathwayCategory.pathways.description PathwayCategory.pathways.name" longDescription="" sortOrder="PathwayCategory.category asc">
+    <constraint path="PathwayCategory.category" editable="true" op="=" value="Metabolism"/>
+  </query>
+</template>
+<template name="Pathway_Genes" title="Pathway --&gt; Genes" comment="">
+  <query name="Pathway_Genes" model="genomic" view="Pathway.identifier Pathway.description Pathway.name Pathway.genes.primaryIdentifier Pathway.genes.secondaryIdentifier Pathway.genes.symbol Pathway.genes.name Pathway.genes.organism.shortName" longDescription="" sortOrder="Pathway.identifier asc">
+    <constraint path="Pathway.name" editable="true" op="=" value="Pyrimidine metabolism"/>
+  </query>
+</template>
+<template name="Protein_Genes" title="Protein --&gt; Genes" comment="">
+  <query name="Protein_Genes" model="genomic" view="Protein.primaryIdentifier Protein.primaryAccession Protein.genes.primaryIdentifier Protein.genes.secondaryIdentifier Protein.genes.symbol Protein.genes.name Protein.genes.chromosome.primaryIdentifier Protein.genes.chromosomeLocation.start Protein.genes.chromosomeLocation.end Protein.genes.chromosomeLocation.strand" longDescription="" sortOrder="Protein.primaryIdentifier asc">
+    <constraint path="Protein" editable="true" op="LOOKUP" value="A0A2K3CSD8"/>
+  </query>
+</template>
+<template name="Protein_Sequence" title="Protein --&gt; Sequence" comment="">
+  <query name="Protein_Sequence" model="genomic" view="Protein.primaryIdentifier Protein.primaryAccession Protein.organism.name Protein.sequence.length Protein.sequence.residues" longDescription="" sortOrder="Protein.primaryIdentifier asc">
+    <constraint path="Protein" editable="true" op="LOOKUP" value="A0A2K3CS10"/>
+  </query>
+</template>
+<template name="Symbol_Gene" title="Symbol --&gt; Gene" comment="">
+  <query name="Symbol_Gene" model="genomic" view="Gene.primaryIdentifier Gene.secondaryIdentifier Gene.symbol Gene.name" longDescription="" sortOrder="Gene.primaryIdentifier asc">
+    <constraint path="Gene" editable="true" op="LOOKUP" value="RWP14"/>
+  </query>
+</template>
+<template name="Type_Gene_Families_Genes" title="Type Gene Families --&gt; Genes" comment="">
+  <query name="Type_Gene_Families_Genes" model="genomic" view="GeneFamilies.gene.primaryIdentifier GeneFamilies.gene.secondaryIdentifier GeneFamilies.gene.symbol GeneFamilies.gene.name GeneFamilies.gene.organism.shortName GeneFamilies.name GeneFamilies.type.name GeneFamilies.dataset.name GeneFamilies.annotation" longDescription="" sortOrder="GeneFamilies.gene.primaryIdentifier asc">
+    <constraint path="GeneFamilies.type.name" editable="true" op="=" value="PlnTFDB"/>
+  </query>
+</template>
+</template-queries>

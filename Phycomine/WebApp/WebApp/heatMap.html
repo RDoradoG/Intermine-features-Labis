@@ -1,0 +1,84 @@
+<!-- heatMap.html -->
+
+<div id="heatmap_div">
+
+
+  <html:link linkName="#" styleId="heatMapHideShowButton" id="heatMapHideShowButton" style="cursor:pointer">
+    <h3>
+      <div id='max_default_open_message'></div>
+      <b>Click to see/hide</b> the expression maps<img src="images/undisclosed.gif" id="oc">
+    </h3>
+  </html:link>
+
+
+  <div id="heatmapGraph" style="display: block">
+
+    <div id='max_cluster_message'></div>
+
+    <div id="heatmapContainer">
+      <table class="visualizationTable">
+        <tr>
+          <td>
+            <div style="padding: 0px 0px 5px 30px;">
+              <span>Type:</span>
+              <select id="experimentType"></select>
+
+              <span>Experiment:</span>
+              <select id="experimentSelect"></select>
+
+              <span>Z-value:</span>
+              <input type="checkbox" name="Zscore" id="Zscore" value="Zscore">
+            </div>
+            <div id="set_canvas_heatMap" class="canvasXpressClass">
+              <canvas id="canvas_heatMap" width="700" height="550"></canvas>
+            </div>
+            <div id="set_canvas_geneProfile" class="canvasXpressClass">
+              <canvas id="canvas_geneProfile" width="700" height="550"></canvas>
+            </div>
+            <div id="geneListGeneProfile" class="geneListGeneProfile">
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+      <html:link linkName="#" styleId="heatMapHideShowButtonSecond" id="heatMapHideShowButtonSecond" style="cursor:pointer">
+        <h3>
+          <b>Click to see/hide</b> the secundary expression maps<img src="images/undisclosed.gif" id="ocsecundary">
+        </h3>
+      </html:link>
+    </div>
+
+    <div id="idSecundary" style="display: block">
+      <table class="visualizationTable">
+        <tr>
+          <td>
+            <div style="padding: 0px 0px 5px 30px;">
+              <span>Type:</span>
+              <select id="experimentType_secundary"></select>
+
+              <span>Experiment:</span>
+              <select id="experimentSelect_secundary"></select>
+
+              <span>Z-value:</span>
+              <input type="checkbox" name="Zscore_second" id="Zscore_second" value="Zscore">
+            </div>
+            <div id="set_canvas_heatMap_secundary" class="canvasXpressClass">
+              <canvas id="canvas_heatMap_secundary" width="700" height="550"></canvas>
+            </div>
+            <div id="set_canvas_geneProfile_secundary" class="canvasXpressClass">
+              <canvas id="canvas_geneProfile_secundary" width="700" height="550"></canvas>
+            </div>
+            <div id="geneListGeneProfile_secondary" class="geneListGeneProfile">
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="model/js/expressionsVisualizationsClass.js"></script>
+
+<!-- /heatMap.html -->

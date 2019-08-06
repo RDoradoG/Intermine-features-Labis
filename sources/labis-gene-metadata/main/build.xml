@@ -1,4 +1,0 @@
-<project name="labis-gene-metadata-tasks" default="default" basedir=".">
-  <description>build labis-gene-metadata tasks</description>
-  <import file="../../../../imbuild/library.xml"/> 
-</project>

@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+
+<classes>
+  <class name="ExperimentDescription" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="description" type="java.lang.String" />
+    <attribute name="experimentTitle" type="java.lang.String" />
+    <attribute name="accession" type="java.lang.String" />
+    <collection name="publications" referenced-type="Publication" reverse-reference="experimentDescription"/>
+    <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="experiment"/>
+  </class>
+
+  <class name="ExpressionTypeDiccionary" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="type"/>
+  </class>    
+
+  <class name="ExpressionValues" is-interface="true">
+    <attribute name="expressionValue" type="java.lang.Float" />
+    <reference name="condition" referenced-type="ExperimentConditions" reverse-reference="expressionValue" />
+    <reference name="gene" referenced-type="Gene" reverse-reference="expressionValue" />
+    <reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="expressionValue" />
+    <reference name="type" referenced-type="ExpressionTypeDiccionary" reverse-reference="expressionValue" />
+  </class>
+
+  <class name="ExperimentConditions" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="description" type="java.lang.String" />
+    <attribute name="instrument" type="java.lang.String" />
+    <attribute name="strategy" type="java.lang.String" />
+    <attribute name="source" type="java.lang.String" />
+    <attribute name="selection" type="java.lang.String" />
+    <attribute name="layout" type="java.lang.String" />
+    <attribute name="srrNumber" type="java.lang.String" />
+    <collection name="expressionValue"  referenced-type="ExpressionValues" reverse-reference="condition"/>
+  </class>
+
+  <class name="GeneFamilies" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <attribute name="dbLink" type="java.lang.String" />
+    <attribute name="annotation" type="java.lang.String" />
+    <reference name="dataset" referenced-type="GeneFamilyDataset" reverse-reference="geneFamily"/>
+    <reference name="type" referenced-type="TypeGeneFamily" reverse-reference="geneFamily"/>
+    <collection name="gene"  referenced-type="Gene" reverse-reference="geneFamily"/>
+  </class>
+
+  <class name="GeneFamilyDataset" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <collection name="geneFamily" referenced-type="GeneFamilies" reverse-reference="dataset"/>
+  </class>
+
+  <class name="TypeGeneFamily" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <collection name="geneFamily" referenced-type="GeneFamilies" reverse-reference="type"/>
+  </class>
+
+  <class name="Gene" is-interface="true">
+    <reference name="hcca" referenced-type="Hcca" reverse-reference="gene"/>
+    <collection name="hrr_a" referenced-type="Hrr" reverse-reference="gene_a"/>
+    <collection name="hrr_b" referenced-type="Hrr" reverse-reference="gene_b"/>
+    <reference name="ortholog" referenced-type="Ortholog" reverse-reference="gene"/>
+    <collection name="expressionValue" referenced-type="ExpressionValues" reverse-reference="gene"/>
+    <collection name="geneFamily"  referenced-type="GeneFamilies" reverse-reference="gene"/>
+    <collection name="genomicProtein" referenced-type="GenomicProtein" reverse-reference="genesGP"/>
+    <collection name="geneNeighborhood" referenced-type="Hrr" reverse-reference="neighborhood"/>
+    <collection name="pathways" referenced-type="Pathway" reverse-reference="genes"/>
+  </class>
+
+  <class name="Publication" is-interface="true">
+    <collection name="experimentDescription" referenced-type="ExperimentDescription" reverse-reference="publications"/>
+  </class>
+
+  <class name="Transcript" is-interface="true">
+    <attribute name="description" type="java.lang.String" />
+  </class>
+
+  <class name="GenomicProtein" extends="Protein" is-interface="true">
+    <collection name="genesGP" referenced-type="Gene" reverse-reference="genomicProtein"/>
+  </class>
+
+  <class name="Ortholog" is-interface="true">
+    <attribute name="name" type="java.lang.String" />
+    <collection name="gene" referenced-type="Gene" reverse-reference="ortholog"/>
+  </class>
+
+  <class name="Hcca" is-interface="true">
+    <attribute name="cluster" type="java.lang.String" />
+    <collection name="hrr" referenced-type="Hrr" reverse-reference="hcca"/>
+    <collection name="gene" referenced-type="Gene" reverse-reference="hcca"/>
+  </class>
+
+  <class name="Hrr" is-interface="true">
+    <reference name="gene_a" referenced-type="Gene" reverse-reference="hrr_a"/>
+    <reference name="gene_b" referenced-type="Gene" reverse-reference="hrr_b"/>
+    <reference name="hcca" referenced-type="Hcca" reverse-reference="hrr"/>
+    <attribute name="rank" type="java.lang.Integer"/>
+    <collection name="neighborhood" referenced-type="Gene" reverse-reference="geneNeighborhood"/>
+  </class>
+
+  <class name="PathwayCategory" is-interface="true">
+    <attribute name="category" type="java.lang.String" />
+    <collection name="pathways" referenced-type="Pathway" reverse-reference="category"/>
+  </class>
+
+  <class name="Pathway" is-interface="true">
+    <attribute name="identifier" type="java.lang.String"/>
+    <attribute name="name" type="java.lang.String"/>
+    <attribute name="description" type="java.lang.String"/>
+    <reference name="category" referenced-type="PathwayCategory" reverse-reference="pathways"/>
+    <collection name="genes" referenced-type="Gene" reverse-reference="pathways"/>
+    <collection name="dataSets" referenced-type="DataSet"/>
+  </class>
+
+</classes>

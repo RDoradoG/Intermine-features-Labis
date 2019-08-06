@@ -1,0 +1,28 @@
+.canvasXpressClass {
+	position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    width: 40%;
+    float: left;
+    box-sizing: border-box;
+}
+
+.visualizationTable{
+	width: 100%;
+}
+
+.geneListGeneProfile{
+	width: 12%;
+    border: solid;
+    border-color: black;
+    border-style: double;
+    overflow-y: scroll;
+    max-height: 550px;
+    position: relative;
+    min-height: 1px;
+    padding-right: 15px;
+    padding-left: 15px;
+    float: left;
+    box-sizing: border-box;
+}
