@@ -33,7 +33,7 @@ public class LabisGeneMetadataConverter extends BioFileConverter
 {
     private static final String DATASET_TITLE                                = "LabisGeneMetadata";
     private static final String DATA_SOURCE_NAME                             = "labis-gene-metadata";
-    private static final String LOGFILE                                      = "/home/rdorado/logs/MyJavaLog.log"; //Change to another file that already exists
+    private static final String LOGFILE                                      = "/home/phycomine/intermine/log/phycomineDbModel.log"; //Change to another file that already exists
 
     private ErrorLog loggable;
     private Iterator<?> tsvIter;
