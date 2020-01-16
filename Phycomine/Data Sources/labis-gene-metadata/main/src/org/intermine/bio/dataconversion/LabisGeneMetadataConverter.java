@@ -1,7 +1,7 @@
 package org.intermine.bio.dataconversion;
 
 /**
- * Labis - IQ, USP. São Paulo
+ * Labis - IQ, USP. Sao Paulo
  *
  * Functionallity of Labis Gene Metadata Converter
  *
