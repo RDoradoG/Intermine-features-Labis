@@ -1,0 +1,5 @@
+<project name="labis-phenotype-metadata" default="default" basedir=".">
+  <description>build, test, package labis-phenotype-metadata</description>
+  
+  <import file="../../../imbuild/source.xml"/>
+</project>

@@ -1,0 +1,4 @@
+<project name="labis-phenotype-metadata-tasks" default="default" basedir=".">
+  <description>build labis-phenotype-metadata tasks</description>
+  <import file="../../../../imbuild/library.xml"/> 
+</project>

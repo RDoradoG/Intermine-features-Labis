@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!-- This file details any extensions needed to the data model to store data from this source, everything else is automatically generated from the model description so this is all we need to do to add to the model. -->
+
+<classes>
+<!-- add any <class> elements here -->
+	<class name="ExperimentDescription" is-interface="true">
+    <collection name="phenotypeValue"  referenced-type="PhenotypeValues" reverse-reference="experiment"/>
+  </class>
+
+  <class name="ExpressionTypeDiccionary" is-interface="true">
+    <collection name="phenotypeValue"  referenced-type="PhenotypeValues" reverse-reference="type"/>
+  </class>
+
+  <class name="ExperimentConditions" is-interface="true">
+    <collection name="phenotypeValue"  referenced-type="PhenotypeValues" reverse-reference="condition"/>
+  </class>
+
+  <class name="PhenotypeValues" is-interface="true">
+    <attribute name="time" type="java.lang.Float"/>
+    <attribute name="phenotypeValue" type="java.lang.Float"/>
+
+    <attribute name="phenotypeValueSD" type="java.lang.Float"/>
+
+    <reference name="timeMeasure" referenced-type="TimeMeasure" reverse-reference="phenotypeValue"/>
+    <reference name="phenotype" referenced-type="Phenotype" reverse-reference="phenotypeValue"/>
+    <reference name="measure" referenced-type="Measure" reverse-reference="phenotypeValue"/>
+    <reference name="condition" referenced-type="ExperimentConditions" reverse-reference="phenotypeValue"/>
+    <reference name="experiment" referenced-type="ExperimentDescription" reverse-reference="phenotypeValue"/>
+    <reference name="type" referenced-type="ExpressionTypeDiccionary" reverse-reference="phenotypeValue"/>
+
+    <reference name="organism" referenced-type="Organism" reverse-reference="phenotypeValue"/>
+  </class>
+
+  <class name="Organism" is-interface="true">
+    <collection name="phenotypeValue"  referenced-type="PhenotypeValues" reverse-reference="organism"/>
+  </class>
+
+  <class name="TimeMeasure" is-interface="true">
+    <attribute name="timeMeasure" type="java.lang.String"/>
+
+    <attribute name="rate" type="java.lang.String"/>
+    <attribute name="root" type="java.lang.Float"/>
+    
+    <collection name="phenotypeValue" referenced-type="PhenotypeValues" reverse-reference="timeMeasure"/>
+  </class>
+
+  <class name="Phenotype" is-interface="true">
+    <attribute name="phenotype" type="java.lang.String"/>
+    <reference name="measureType" referenced-type="MeasureType" reverse-reference="phenotype"/>
+    <collection name="phenotypeValue" referenced-type="PhenotypeValues" reverse-reference="phenotype"/>
+  </class>
+
+  <class name="Measure" is-interface="true">
+    <attribute name="measure" type="java.lang.String"/>
+
+    <attribute name="rate" type="java.lang.String"/>
+    <attribute name="root" type="java.lang.Float"/>
+
+    <reference name="measureType" referenced-type="MeasureType" reverse-reference="measure"/>
+    <collection name="phenotypeValue" referenced-type="PhenotypeValues" reverse-reference="measure"/>
+  </class>
+
+  <class name="MeasureType" is-interface="true">
+    <attribute name="measureType" type="java.lang.String"/>
+    <collection name="phenotype" referenced-type="Phenotype" reverse-reference="measureType"/>
+    <collection name="measure" referenced-type="Measure" reverse-reference="measureType"/>
+  </class>
+
+</classes>
